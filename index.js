@@ -5,7 +5,7 @@ const PORT = process.env.PORT || 5000
 const Pool = require('pg').Pool;
 
 
-//Connect to Postgres database 
+//Connect to Postgres database
 
 var pool = new Pool({
   user: process.env.DB_USER || 'postgres',
@@ -50,7 +50,7 @@ function loginUser(data, callback) {
 		callback(null, result.rows[0]);
 	});
 
-	
+
 }
 
 // Create web server
@@ -113,4 +113,19 @@ app.post("/api/login", function(req, res) {
 			res.redirect('/');
 		}
 	})
+});
+
+app.get('/admin', async (req, res) => {
+    try {
+      const client = await pool.connect();
+      const result = await client.query('SELECT * FROM users order by lastname', function(error, result){
+        const results = { 'results': (result) ? result.rows : null};
+        res.render('pages/admin', results );
+        client.release();
+      });
+    }catch (err) {
+      console.error(err);
+      res.send("Error " + err);
+    }
+
 });

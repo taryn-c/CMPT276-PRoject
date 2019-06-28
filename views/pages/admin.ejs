@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Admin Home</title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+</head>
+
+<body>
+  <% include ../partials/navigation.ejs %>
+  <br>
+  <div class="container">
+
+    <div class="well">
+    <table>
+    <%results.forEach(function(r) { %>
+      <tr>
+        <td>
+          <h4 style="margin-top:20px; font-weight: lighter;"><%=r.firstname%> <%=r.lastname%></h4>
+        </td>
+        <td>
+          <button style="margin-left: 20px; margin-top: 20px;" class='btn btn-outline-dark'
+          data-toggle='collapse' href='#user_<%=r.username%>' aria-expanded='false'
+          aria-controls='user_<%=r.username%>'>
+          View
+          </button>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <div class="collapse" id='user_<%=r.username%>'>
+            <p><strong>Weight: </strong><%=r.weight%></p>
+            <p><strong>Height: </strong><%=r.height%></p>
+            <p><strong>Email: </strong><%=r.email%></p>
+            <p><strong>Birth Date </strong><%=r.birthday%></p>
+            <hr>
+            <button class="btn btn-dark" onclick='window.location.href="/edituser/<%=r.username%>"'>Edit</button>
+            <button class="btn btn-danger" id="delete" onclick="deleteStudent(<%=r.username%>)";>Delete</button>
+            <hr>
+          </div>
+        </td>
+      </tr>
+      <script>
+        function deleteStudent(id) {
+          document.getElementById('delete');
+          if(window.confirm("Are you sure you want to delete this user?")) {
+            window.location.href="/delete-user/"+id;
+          }
+          else return;
+        }
+      </script>
+
+    <% });%>
+    </table>
+    </div>
+  </div>
+
+  <script
+    src="https://code.jquery.com/jquery-1.12.4.js"
+    integrity="sha256-Qw82+bXyGq6MydymqBxNPYTaUXXq7c8v3CwiYwLLNXU="
+    crossorigin="anonymous"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+</body>
+
+</html>
