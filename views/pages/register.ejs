@@ -3,29 +3,115 @@
 
 <head>
     <title>GitFit Login</title>
-    <% include ../partials/header.ejs %>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <style type="text/css">
+    	body{
+    		color: #fff;
+    		font-family: 'Roboto', sans-serif;
+    	}
+        .form-control{
+    		height: 40px;
+    		box-shadow: none;
+    		color: #969fa4;
+    	}
+    	.form-control:focus{
+    		border-color: #5cb85c;
+    	}
+        .form-control, .btn{
+            border-radius: 3px;
+        }
+    	.signup-form{
+    		width: 400px;
+    		margin: 0 auto;
+    		padding: 30px 0;
+    	}
+    	.signup-form h2{
+    		color: black;
+        margin: 0 0 15px;
+    		position: relative;
+    		text-align: center;
+        }
 
+    	.signup-form h2:before{
+    		left: 0;
+    	}
+    	.signup-form h2:after{
+    		right: 0;
+    	}
+      .signup-form form{
+    		color: #999;
+    		border-radius: 3px;
+        margin-bottom: 15px;
+        background: #f2f3f7;
+        box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.3);
+        padding: 30px;
+      }
+    	.signup-form .form-group{
+    		margin-bottom: 20px;
+      }
+
+    	.signup-form .btn{
+        font-size: 16px;
+        font-weight: bold;
+    		min-width: 140px;
+        outline: none !important;
+        }
+
+        .signup-form a{
+    		color: #fff;
+    		text-decoration: underline;
+    	}
+        .signup-form a:hover{
+    		text-decoration: none;
+    	}
+    	.signup-form form a{
+    		color: #5cb85c;
+    		text-decoration: none;
+    	}
+    	.signup-form form a:hover{
+    		text-decoration: underline;
+    	}
+  </style>
 </head>
 
 <body>
     <% include ../partials/nav.ejs %>
     <main>
-        <div class="login-form">
-            <h1>Registration Form</h1>
+        <div class="signup-form">
+            <h2>Create an Account</h2>
             <form action="api/register" method="POST">
-                <input type="text" name="username" placeholder="Username" required>
-                <input type="password" name="password" placeholder="Password" required>
-                <input type="text" name="firstname" placeholder="First Name" required>
-                <input type="text" name="lastname" placeholder="Last Name" required>
-                <input type="text" name="email" placeholder="email" required>
-                <input type="date" name="birthday" placeholder="birthday" required>
-                <input type="number" name="weight" placeholder="weight (lbs)" step="1" required>
-                <input type="number" name="height" placeholder="height(cm)" step="1" required>
-                <input type="submit">
+              <div class="form-group">
+                <input type="text" class="form-control" name="username" placeholder="Username" required>
+              </div>
+              <div class="form-group">
+                <input type="password" class="form-control" name="password" placeholder="Password" required>
+              </div>
+              <div class="form-group">
+                <input type="text" class="form-control" name="firstname" placeholder="First Name" required>
+              </div>
+              <div class="form-group">
+                <input type="text" class="form-control" name="lastname" placeholder="Last Name" required>
+              </div>
+              <div class="form-group">
+                <input type="text" class="form-control" name="email" placeholder="Email" required>
+              </div>
+              <div class="form-group">
+                <input type="date" class="form-control" name="birthday" placeholder="Birth Date" required>
+              </div>
+              <div class="form-group">
+                <input type="number" class="form-control" name="weight" placeholder="Weight (lbs)" step="0.01" required>
+              </div>
+              <div class="form-group">
+                <input type="number" class="form-control" name="height" placeholder="Height(cm)" step="0.01" required>
+              </div>
+              <div style="text-align:center"class="form-group">
+                <button type="submit" class="btn btn-success btn-large">Register Now</button>
+              </div>
                 <!-- <input type ="register"> -->
             </form>
-
+            <div class="text-center">
+             <p>Already have an account?</p>
+            <a href="/login">Sign In</a></div>
         </div>
     </main>
 </body>
