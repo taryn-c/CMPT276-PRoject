@@ -8,10 +8,11 @@ const Pool = require('pg').Pool;
 //Connect to Postgres database
 
 var pool = new Pool({
-  user: process.env.DB_USER || 'postgres',
-  password: process.env.DB_PASS || 'root',
-  host: process.env.DB_HOST || 'localhost',
-  database: process.env.DB_DATABASE || 'postgres'
+/*  user:'postgres',
+  password:  'root',
+  host: 'localhost',
+  database: 'postgres' || */
+  connectionString: process.env.DATABASE_URL, ssl: true
 });
 
 
