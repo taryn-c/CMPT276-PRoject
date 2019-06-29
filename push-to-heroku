@@ -1,0 +1,24 @@
+#!/usr/bin/env bash
+HEROKU_URL="https://git.heroku.com/git-fit-app.git"
+
+if ! heroku auth:whoami &>/dev/null; then
+	if ! heroku login; then
+		printf "\x1B[31m%s\x1B[0m\n" "Failed to log in to heroku."
+		exit 100
+	fi
+fi
+
+if git remote get-url --push heroku &>/dev/null; then
+	git push heroku master
+	result=$?
+	if [[ "$result" -ne 0 ]]; then
+		printf "\x1B[31m%s\x1B[0m\n" "Failed to push to heroku."
+	fi
+	exit $result
+fi
+
+# Set up the heroku remote.
+git remote add heroku "$HEROKU_URL"
+bash "$0"
+exit $?
+
