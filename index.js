@@ -1,17 +1,17 @@
 const express = require('express')
 const path = require('path')
 const expressSession = require('express-session')
-const PORT = process.env.PORT || 5000
+const PORT = process.env.PORT || 8080
 const Pool = require('pg').Pool;
+
+const ADMIN_LEVEL_NOT_ADMIN = 0;
+const ADMIN_LEVEL_REGULAR_ADMIN = 1;
+const ADMIN_LEVEL_SUPER_ADMIN = 2;
 
 
 //Connect to Postgres database
 
 var pool = new Pool({
-/*  user:'postgres',
-  password:  'root',
-  host: 'localhost',
-  database: 'postgres' || */
   connectionString: process.env.DATABASE_URL, ssl: true
 });
 
@@ -50,8 +50,48 @@ function loginUser(data, callback) {
 
 		callback(null, result.rows[0]);
 	});
+}
 
+function statUser(data, callback) {
+	let id = (typeof data === 'number') ? data : (data.loginid == null ? data.id : data.loginid);
+	if (id != null) {
+		return statUserById(id, callback);
+	}
 
+	let username = (typeof data === 'string') ? data : data.username;
+	if (username != null) {
+		return statUserByUsername(username, callback);
+	}
+
+	throw new Error("Unknown user lookup key provided to statUser");
+}
+
+function statUserById(id, callback) {
+	pool.query("select * from users where id=$1", [id], function(error, result){
+		if (error){
+			return callback(error);
+		}
+
+		if (result.rows.length == 0) {
+			return callback("Unknown user id " + id);
+		}
+
+		callback(null, result.rows[0]);
+	});
+}
+
+function statUserByUsername(username, callback) {
+	pool.query("select * from users where username=$1", [username], function(error, result){
+		if (error){
+			return callback(error);
+		}
+
+		if (result.rows.length == 0) {
+			return callback("Unknown user login " + username);
+		}
+
+		callback(null, result.rows[0]);
+	});
 }
 
 function loginRequired(req, res, next) {
@@ -115,12 +155,16 @@ app.post("/api/login", function(req, res) {
 		req.session.user = {
 			name: data.firstname+" "+data.lastname
 		}
+
 		//Redirect
 		if (req.body.redirect != null){
 			res.redirect(req.body.redirect)
-		}
-		else{
-			res.redirect('/');
+		} else{
+			if (data.adminlevel >= ADMIN_LEVEL_REGULAR_ADMIN) {
+				res.redirect('/admin');
+			} else {
+				res.redirect('/');
+			}
 		}
 	})
 });

@@ -1,16 +1,14 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
-  <% include ../partials/header.ejs %>
+  <h1>GitFit Landing Page</h1>
+  <% include ../partials/head.ejs %>
 </head>
 
 <body>
 
-  <% include ../partials/nav.ejs %>
 
 <main>
-
   <% if (session.login) { %>
     <button class="btn btn-primary pull-right" onclick='window.location.href="/logout"'>
      Logout</button>
@@ -19,6 +17,8 @@
 
     <% } %>
 
+<a href="register">Click here to register</a><br>
+<a href="login">Click here to login</a>
 </main>
 
 </body>
