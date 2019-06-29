@@ -1,19 +1,20 @@
 <!DOCTYPE html>
 <html>
 <head>
+  <h1>GitFit Landing Page</h1>
   <% include ../partials/head.ejs %>
 </head>
 
 <body>
 
-  <% include ../partials/nav.ejs %>
 
 <main>
-
   <% if (session.login) { %>
-    Hi, <%= session.user.name %>
+    Hi, <%= session.user.name %><br><br>
     <% } %>
 
+<a href="register">Click here to register</a><br>
+<a href="login">Click here to login</a>
 </main>
 
 </body>
