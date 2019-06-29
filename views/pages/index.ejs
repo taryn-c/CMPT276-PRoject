@@ -1,19 +1,24 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <% include ../partials/header.ejs %>
+  <h1>GitFit Landing Page</h1>
+  <% include ../partials/head.ejs %>
 </head>
 
 <body>
 
-  <% include ../partials/nav.ejs %>
 
 <main>
-
   <% if (session.login) { %>
+    <button class="btn btn-primary pull-right" onclick='window.location.href="/logout"'>
+     Logout</button>
     Hi, <%= session.user.name %>
+
+
     <% } %>
 
+<a href="register">Click here to register</a><br>
+<a href="login">Click here to login</a>
 </main>
 
 </body>
