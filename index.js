@@ -1,7 +1,7 @@
 const express = require('express')
 const path = require('path')
 const expressSession = require('express-session')
-const PORT = process.env.PORT || 5000
+const PORT = process.env.PORT || 8080
 const Pool = require('pg').Pool;
 
 const ADMIN_LEVEL_NOT_ADMIN = 0;
