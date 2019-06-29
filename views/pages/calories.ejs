@@ -2,12 +2,34 @@
 <html lang="en">
   <head>
     <meta charset="utf-8">
-    <title>CaloriesAnalytics</title>
+    <title>Calories Analytics</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
   </head>
+
   <body>
-	<h1>CaloriesAnalytics</h1>
+  <% include ../partials/nav.ejs %>
+  <main>
+      <div class="calories-form">
+          <form action="/api/calories" method="POST">
+              <h2 class="text-center">Input Workout Info</h2>
+              <div class="form-group">
+                <input type="number" class="form-control" name="calories-burned" placeholder="Calories-burned" required>
+              </div>
+              <div class="form-group">
+                <input type="number" class="form-control" name="time-exercised" placeholder="Time-exercised (min)" required>
+              </div>
+              <div class="form-group">
+                Date taken place:
+                <input type="date" class="form-control" name="on-date" required>
+              </div>
+              <div class="form-group">
+              <button type="submit" class="btn btn-primary btn-block">Add to record</button>
+              </div>
+          </form>
+
+      </div>
+  </main>
 
   </body>
 </html>
