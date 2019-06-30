@@ -26,20 +26,20 @@ const ADMIN_LEVEL_SUPER_ADMIN = 2;
 
 //Connect to Postgres database
 
-/* var pool = new Pool({
+ var pool = new Pool({
   connectionString: process.env.DATABASE_URL, ssl: true
 });
- */
+ 
 
-
+/*
 var pool = new Pool({
 	user: process.env.DB_USER || 'postgres',
 	password: process.env.DB_PASS || 'root',
 	host: process.env.DB_HOST || 'localhost',
 	database: process.env.DB_DATABASE || 'postgres'
   });
-  
-  
+*/
+
 
 function createUser(data, callback) {
 	if (data.username == null) return callback('createUser missing username in 2nd argument');
@@ -63,10 +63,10 @@ function createUser(data, callback) {
 		var calorie = (655.1 + (9.6 *data.weight) + (1.8 * data.height) - (4.7*data.age))
 		calorie = (calorie*data.activity_level)
 		calorie = calorie + data.fit_goal;
-		}	
-	
+		}
+
 		maintcal = parseInt(calorie);
-	
+
 	var goalcount = 0;
 
 	// To do: check for duplicate emails and usernames
