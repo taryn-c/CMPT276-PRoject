@@ -8,8 +8,21 @@ const ADMIN_LEVEL_NOT_ADMIN = 0;
 const ADMIN_LEVEL_REGULAR_ADMIN = 1;
 const ADMIN_LEVEL_SUPER_ADMIN = 2;
 
-// IMPORTANT: New DATABASE:
-// public.users(username, password, firstname, lastname, email, age, weight, height, gender, activity_level, fit_goal, calorie)
+
+
+// IMPORTANT: Okay I spent awhile on this but still have more to do.
+// Basically (1) I'm trying to figure out a good way to add 'daily goals' for a user that goes into a database so they're there when
+// the user logs out and logs in. Also, (2) need to figure out how to properly delete these when they finish their daily goals and check it off.
+// The deletion should come easy if we can figure out a good way to insert them in the first place. Also (3) need to 'reset' these daily goals at 12am every night.
+// And, (4) I computed caloric rate specific to each user based on a formula I found online, just need to link this up with Fahim's calorie burning table
+
+// That shouldn't be too hard though.
+// I'll spend all of tomorrow working on these 4 things. And I'll comment way more to help make sense of my trash code lmao
+
+// To make our lives easier just mark any changes to the database here.
+// For now the running databases are (I haven't touched heroku yet so this is local so far) here:
+// (1) public.users(username, password, firstname, lastname, email, age, weight, height, gender, activity_level, fit_goal, calorie, goalcount)
+// (2) user_progress (uid text references users(username), cal_burn integer, time_spent integer, on_date date);
 
 //Connect to Postgres database
 
@@ -17,6 +30,8 @@ const ADMIN_LEVEL_SUPER_ADMIN = 2;
   connectionString: process.env.DATABASE_URL, ssl: true
 });
  */
+
+
 var pool = new Pool({
 	user: process.env.DB_USER || 'postgres',
 	password: process.env.DB_PASS || 'root',
@@ -56,7 +71,7 @@ function createUser(data, callback) {
 
 	// To do: check for duplicate emails and usernames
 	// if (data.username == pool.query(select * from users where username == data.username))
-	pool.query("INSERT INTO public.users(username, password, firstname, lastname, email, age, weight, height, gender, activity_level, fit_goal, calorie) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13);",
+	pool.query("INSERT INTO public.users(username, password, firstname, lastname, email, age, weight, height, gender, activity_level, fit_goal, calorie, goalcount) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13);",
 		[data.username, data.password, data.firstname, data.lastname, data.email, data.age, data.weight, data.height, data.gender, data.activity_level, data.fit_goal, maintcal, goalcount], callback);
 }
 
