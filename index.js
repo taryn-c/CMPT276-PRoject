@@ -8,14 +8,23 @@ const ADMIN_LEVEL_NOT_ADMIN = 0;
 const ADMIN_LEVEL_REGULAR_ADMIN = 1;
 const ADMIN_LEVEL_SUPER_ADMIN = 2;
 
+// IMPORTANT: New DATABASE:
+// public.users(username, password, firstname, lastname, email, age, weight, height, gender, activity_level, fit_goal, calorie)
 
 //Connect to Postgres database
 
-var pool = new Pool({
+/* var pool = new Pool({
   connectionString: process.env.DATABASE_URL, ssl: true
 });
-
-
+ */
+var pool = new Pool({
+	user: process.env.DB_USER || 'postgres',
+	password: process.env.DB_PASS || 'root',
+	host: process.env.DB_HOST || 'localhost',
+	database: process.env.DB_DATABASE || 'postgres'
+  });
+  
+  
 
 function createUser(data, callback) {
 	if (data.username == null) return callback('createUser missing username in 2nd argument');
@@ -23,15 +32,32 @@ function createUser(data, callback) {
 	if (data.firstname == null) return callback('createUser missing firstname in 2nd argument');
 	if (data.lastname == null) return callback('createUser missing lastname in 2nd argument');
 	if (data.email == null) return callback('createUser missing email in 2nd argument');
-	if (data.birthday == null) return callback('createUser missing birthday in 2nd argument');
+	if (data.age == null) return callback('createUser missing age in 2nd argument');
 	if (data.weight == null) return callback('createUser missing weight in 2nd argument');
 	if (data.height == null) return callback('createUser missing height in 2nd argument');
+	if (data.gender == null) return callback('createUser missing gender in 2nd argument');
+	if (data.activity_level == null) return callback('createUser missing activity_level in 2nd argument');
+	if (data.fit_goal == null) return callback('createUser missing fit_goal in 2nd argument');
 
+	if(data.gender == 'male'){
+		var calorie = (66.47 + (13.7 *data.weight) + (5 * data.height) - (6.8*data.age))
+		calorie = (calorie*data.activity_level)
+		calorie = calorie + data.fit_goal;
+		}
+	else if (data.gender == 'female'){
+		var calorie = (655.1 + (9.6 *data.weight) + (1.8 * data.height) - (4.7*data.age))
+		calorie = (calorie*data.activity_level)
+		calorie = calorie + data.fit_goal;
+		}	
+	
+		maintcal = parseInt(calorie);
+	
+	var goalcount = 0;
 
 	// To do: check for duplicate emails and usernames
 	// if (data.username == pool.query(select * from users where username == data.username))
-	pool.query("INSERT INTO public.users(username, password, firstname, lastname, email, birthday, weight, height) VALUES ($1, $2, $3, $4, $5, $6, $7, $8);",
-		[data.username, data.password, data.firstname, data.lastname, data.email, data.birthday, data.weight, data.height], callback);
+	pool.query("INSERT INTO public.users(username, password, firstname, lastname, email, age, weight, height, gender, activity_level, fit_goal, calorie) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13);",
+		[data.username, data.password, data.firstname, data.lastname, data.email, data.age, data.weight, data.height, data.gender, data.activity_level, data.fit_goal, maintcal, goalcount], callback);
 }
 
 function loginUser(data, callback) {
@@ -102,6 +128,21 @@ function loginRequired(req, res, next) {
   next();
 }
 
+// Creates daily goals
+function createGoal(data, callback){
+	if (data.goal == null) return callback('Error: goal is empty');
+
+	// TODO:
+	// Insert goal data in table dailygoal(username, goalnum, goal)
+}
+
+// Deletes daily goals
+function removeGoal(data, callback){
+
+	pool.query("DELETE FROM dailygoal WHERE ")
+}
+
+
 // Create web server
 
 
@@ -123,7 +164,6 @@ app.get('/', loginRequired,(req, res) => res.render('pages/index', {session:req.
 app.get('/login', (req, res) => res.render('pages/login'))
 app.get('/register', (req, res) => res.render('pages/register'))
 app.get('/calories', loginRequired, (req, res) => res.render('pages/calories.ejs'))
-
 app.listen(PORT, () => console.log(`Listening on ${ PORT }`))
 
 
@@ -136,9 +176,10 @@ app.post('/api/register', function(req, res) {
 			return;
 		}
 
-		res.redirect('pages/login');
+		res.redirect('/');
 	});
 });
+
 
 app.post("/api/login", function(req, res) {
 	loginUser(req.body, function (error, data) {
@@ -153,7 +194,11 @@ app.post("/api/login", function(req, res) {
 		req.session.loginid = data.id;
 		req.session.login = true;
 		req.session.user = {
-			name: data.firstname+" "+data.lastname
+			fname: data.firstname,
+			lname: data.lastname,
+			calorie: data.calorie,
+			username: data.username,
+			goalcount: data.goalcount
 		}
 
 		//Redirect
@@ -195,4 +240,16 @@ app.get('/admin', loginRequired, async (req, res) => {
       res.send("Error " + err);
     }
 
+});
+
+
+app.post('/api/addGoal', function(req,res) {
+	createGoal(req.body, function(error, data){
+		if (error){
+			res.status(400);
+			res.send("Query failed");
+			console.error(error);
+			return;
+		}
+	});
 });

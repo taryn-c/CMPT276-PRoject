@@ -9,16 +9,96 @@
 
 
 <main>
+  <% include ../partials/styles/index.ejs %>
   <% if (session.login) { %>
+    <div align="left">
     <button class="btn btn-primary pull-right" onclick='window.location.href="/logout"'>
      Logout</button>
-    Hi, <%= session.user.name %>
+     </div>
+     <h3>
+      Hi, <%= session.user.fname %>
+     </h3>
 
+    <div id="myDIV" class="header">
+      <form id='newGoal' action='/api/addGoal' method="POST">
+      <h2>Today's Fitness Goals</h2>
+      <input type="text" id="myInput" name="goal" placeholder="Goal...">
+      <input type="hidden" name="username" value="<%= session.user.username%>">
+      <span onclick="newElement()" class="addBtn">Add</span>
+      </form>
+    </div>
+  
+    <ul id="myUL">
+      <li>Try me!</li>
+    </ul>
+    <script>
+    var count = 0;
+      // Create a "close" button and append it to each list item
+    var myNodelist = document.getElementsByTagName("LI");
+    var i;
+    for (i = 0; i < myNodelist.length; i++) {
+      var span = document.createElement("SPAN");
+      var txt = document.createTextNode("\u00D7");
+      span.className = "close";
+      span.appendChild(txt);
+      myNodelist[i].appendChild(span);
+    }
+  
+  
+    // Add a "checked" symbol when clicking on a list item
+    var list = document.querySelector('ul');
+    list.addEventListener('click', function(ev) {
+      if (ev.target.tagName === 'LI') {
+        ev.target.classList.toggle('checked');
+        setTimeout(()=>{
+          ev.target.style.display="none";
+          document.getElementById("")
+        }, 1000)
+  
+      }
+    }, false);
+  
+    // Create a new list item when clicking on the "Add" button
+    function newElement() {
+      var li = document.createElement("li");
+      var inputValue = document.getElementById("myInput").value;
+      
+      var t = document.createTextNode(inputValue);
+      li.appendChild(t);
+      if (inputValue === '') {
+        alert("You must write something!");
+      } else {
+        document.getElementById("myUL").appendChild(li);
+        count++;
+        document.getElementById("newGoal").submit();
+  
+      }
+      document.getElementById("myInput").value = "";
+  
+      var span = document.createElement("SPAN");
+      var txt = document.createTextNode("\u00D7");
+      span.className = "close";
+      span.appendChild(txt);
+      li.appendChild(span);
+  
+      for (i = 0; i < close.length; i++) {
+        close[i].onclick = function() {
+          var div = this.parentElement;
+          div.style.display = "none";
+        }
+      }
+    }
+    </script>
 
-    <% } %>
+    <div id="cal">
+      <h3>Calorie count for your specified goals!</h3>
+      <h4><%= session.user.calorie %></h4>
+    </div>
+    <% } else{ %>
 
 <a href="register">Click here to register</a><br>
 <a href="login">Click here to login</a>
+<% } %>
 </main>
 
 </body>
