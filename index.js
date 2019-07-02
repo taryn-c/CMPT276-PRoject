@@ -1,6 +1,7 @@
 const express = require('express')
 const path = require('path')
 const expressSession = require('express-session')
+var cors = require('cors')
 const PORT = process.env.PORT || 8080
 const Pool = require('pg').Pool;
 
@@ -52,7 +53,7 @@ function createUser(data, callback) {
 		calorie = calorie + data.fit_goal;
 		}
 
-	
+
 
 		maintcal = parseInt(calorie);
 
@@ -182,7 +183,7 @@ function getUserGoals(data, callback){
 
 
 const app = express();
-
+app.use('/', cors());
 app.use(express.static(path.join(__dirname, 'public')))
 app.use(express.json());
 app.use(express.urlencoded({extended:false}));
@@ -198,7 +199,7 @@ app.set('view engine', 'ejs')
 app.get('/', loginRequired,(req, res) => res.render('pages/index', {session:req.session}))
 app.get('/login', (req, res) => res.render('pages/login'))
 app.get('/register', (req, res) => res.render('pages/register'))
-app.get('/calories', loginRequired, (req, res) => res.render('pages/calories'))
+app.get('/calories', loginRequired, (req, res) => res.render('pages/calories', {session:req.session}))
 app.listen(PORT, () => console.log(`Listening on ${ PORT }`))
 
 
@@ -240,7 +241,7 @@ app.post("/api/login", function(req, res) {
 			username: data.username,
 			goalcount: data.goalcount,
 			goals: dailygoal
-	
+
 		}
 
 		//Redirect
@@ -362,7 +363,7 @@ app.post('/api/addGoal', function(req,res){
 	catch(err){
 		console.log(err);
 		res.send("Error " + err);
-	}	
+	}
 	return;
 });
 
@@ -384,3 +385,4 @@ app.post('/api/deleteGoal', function(req,res){
 		}
 			
 });
+module.exports = app;
