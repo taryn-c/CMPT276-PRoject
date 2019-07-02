@@ -10,18 +10,18 @@ const ADMIN_LEVEL_SUPER_ADMIN = 2;
 
 //Connect to Postgres database
 
-/* var pool = new Pool({
+ var pool = new Pool({
  connectionString: process.env.DATABASE_URL, ssl: true
 });
-*/
 
 
-var pool = new Pool({
- user: process.env.DB_USER || 'postgres',
- password: process.env.DB_PASS || 'root',
- host: process.env.DB_HOST || 'localhost',
- database: process.env.DB_DATABASE || 'postgres'
- });
+
+// var pool = new Pool({
+//  user: process.env.DB_USER || 'postgres',
+//  password: process.env.DB_PASS || 'root',
+//  host: process.env.DB_HOST || 'localhost',
+//  database: process.env.DB_DATABASE || 'postgres'
+//  });
 
 function createUser(data, callback) {
 	if (data.username == null) return callback('createUser missing username in 2nd argument');
@@ -55,6 +55,16 @@ function createUser(data, callback) {
 	// if (data.username == pool.query(select * from users where username == data.username))
 	pool.query("INSERT INTO public.users(username, password, firstname, lastname, email, age, weight, height, gender, activity_level, fit_goal, calorie, goalcount) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13);",
 		[data.username, data.password, data.firstname, data.lastname, data.email, data.age, data.weight, data.height, data.gender, data.activity_level, data.fit_goal, maintcal, goalcount], callback);
+}
+
+function addProgress(data, callback) {
+	if (data.caloriesBurned == null) return callback('addProgress missing caloriesBurned');
+	if (data.timeExercised == null) return callback('addProgress missing timeExercised');
+	if (data.onDate == null) return callback('addProgress missing onDate');
+	if (data.username == null) return callback('addProgress missing username');
+
+	pool.query("INSERT INTO public.user_progress (uid, cal_burn, time_spent, on_date) VALUES ($1, $2, $3, $4);",
+		[data.username, data.caloriesBurned, data.timeExercised, data.onDate], callback);
 }
 
 function loginUser(data, callback) {
@@ -160,7 +170,7 @@ app.set('view engine', 'ejs')
 app.get('/', loginRequired,(req, res) => res.render('pages/index', {session:req.session}))
 app.get('/login', (req, res) => res.render('pages/login'))
 app.get('/register', (req, res) => res.render('pages/register'))
-app.get('/calories', loginRequired, (req, res) => res.render('pages/calories.ejs'))
+app.get('/calories', loginRequired, (req, res) => res.render('pages/calories'))
 app.listen(PORT, () => console.log(`Listening on ${ PORT }`))
 
 
@@ -209,6 +219,19 @@ app.post("/api/login", function(req, res) {
 			}
 		}
 	})
+});
+
+app.post('/api/calories', function(req, res) {
+	addProgress(req.body, function(error, data) {
+		if (error) {
+			res.status(400);
+			res.send('ERROR. Query failed, check console for more info.');
+			console.error(error);
+			return;
+		}
+
+		res.redirect('/');
+	});
 });
 
 app.get('/logout', function(req, res, next) {
