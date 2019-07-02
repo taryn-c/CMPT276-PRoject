@@ -8,38 +8,20 @@ const ADMIN_LEVEL_NOT_ADMIN = 0;
 const ADMIN_LEVEL_REGULAR_ADMIN = 1;
 const ADMIN_LEVEL_SUPER_ADMIN = 2;
 
-
-
-// IMPORTANT: Okay I spent awhile on this but still have more to do.
-// Basically (1) I'm trying to figure out a good way to add 'daily goals' for a user that goes into a database so they're there when
-// the user logs out and logs in. Also, (2) need to figure out how to properly delete these when they finish their daily goals and check it off.
-// The deletion should come easy if we can figure out a good way to insert them in the first place. Also (3) need to 'reset' these daily goals at 12am every night.
-// And, (4) I computed caloric rate specific to each user based on a formula I found online, just need to link this up with Fahim's calorie burning table
-
-// That shouldn't be too hard though.
-// I'll spend all of tomorrow working on these 4 things. And I'll comment way more to help make sense of my trash code lmao
-
-// To make our lives easier just mark any changes to the database here.
-// For now the running databases are (I haven't touched heroku yet so this is local so far) here:
-// (1) public.users(username, password, firstname, lastname, email, age, weight, height, gender, activity_level, fit_goal, calorie, goalcount)
-// (2) user_progress (uid text references users(username), cal_burn integer, time_spent integer, on_date date);
-
 //Connect to Postgres database
 
- var pool = new Pool({
-  connectionString: process.env.DATABASE_URL, ssl: true
+/* var pool = new Pool({
+ connectionString: process.env.DATABASE_URL, ssl: true
 });
- 
-
-/*
-var pool = new Pool({
-	user: process.env.DB_USER || 'postgres',
-	password: process.env.DB_PASS || 'root',
-	host: process.env.DB_HOST || 'localhost',
-	database: process.env.DB_DATABASE || 'postgres'
-  });
 */
 
+
+var pool = new Pool({
+ user: process.env.DB_USER || 'postgres',
+ password: process.env.DB_PASS || 'root',
+ host: process.env.DB_HOST || 'localhost',
+ database: process.env.DB_DATABASE || 'postgres'
+ });
 
 function createUser(data, callback) {
 	if (data.username == null) return callback('createUser missing username in 2nd argument');
@@ -241,7 +223,7 @@ app.get('/logout', function(req, res, next) {
     });
   }
 });
-
+//////////////////////ADMIN VIEWS//////////////////////////////////////////////////////
 app.get('/admin', loginRequired, async (req, res) => {
     try {
       const client = await pool.connect();
@@ -257,7 +239,49 @@ app.get('/admin', loginRequired, async (req, res) => {
 
 });
 
+app.get('/edituser/:id', async (req, res) => {
+    try {
+      const client = await pool.connect();
+      await client.query("select * from users where username=$1",[req.params.id], function(error, result){
+        var user={user: result.rows[0]};
+        res.render('pages/editUser', user);
+        client.release();
+      });
+    }catch (err) {
+      console.error(err);
+      res.send("Error " + err);
+    }
 
+});
+
+app.post('/edituser/:id', async (req, res) => {
+    try {
+      const client = await pool.connect();
+      await client.query('update users set username=$1, password=$2, firstname=$3, lastname=$4, email=$5, age=$6, weight=$7, height=$8, gender=$9, activity_level=$10, fit_goal=$11 where id=$12',
+      [req.body.username, req.body.password, req.body.firstname, req.body.lastname, req.body.email,
+      req.body.age, req.body.weight, req.body.height, req.body.gender, req.body.activity_level, req.body.fit_goal, req.params.id]);
+
+      res.redirect('/admin');
+      client.release();
+    }catch (err) {
+      console.error(err);
+      res.send("Error " + err);
+    }
+});
+
+app.get('/deleteuser/:id', async (req, res) => {
+    try {
+      const client = await pool.connect();
+      await client.query('delete from users where username=$1',[req.params.id]);
+      //await client.query('delete from backup where id=$1',[req.params.id]);
+      res.redirect('/admin');
+      client.release();
+    } catch (err) {
+      console.error(err);
+      res.send("Error " + err);
+    }
+});
+//////////////////////////////////////////////////////////////////////////////////////////////////////////
 app.post('/api/addGoal', function(req,res) {
 	createGoal(req.body, function(error, data){
 		if (error){
