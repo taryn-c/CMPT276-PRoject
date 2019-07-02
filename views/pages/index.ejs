@@ -41,8 +41,6 @@
     </ul>
     <script>
     var count = parseInt(document.getElementById("count").innerText);
-    console.log("Did it update goalco");
-    console.log(count);
 
 
       // Create a "close" button and append it to each list item
@@ -113,7 +111,6 @@
       } else {
         ++count;
         li.id = count;
-        console.log(count);
         document.getElementById("myUL").appendChild(li);
         goalcount = document.createElement("input");
         goalcount.type="hidden";
@@ -141,6 +138,12 @@
         }
       }
     }
+
+
+    // TO DO: query and display new net calories for today after user enters data in calories.ejs
+    // Also should be 
+    var calstoday = 0;
+
 
     </script>
 
