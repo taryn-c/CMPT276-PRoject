@@ -63,6 +63,7 @@ function addProgress(data, callback) {
 	if (data.onDate == null) return callback('addProgress missing onDate');
 	if (data.username == null) return callback('addProgress missing username');
 
+  // To do: add cookie to track current user's username, so no re-entry required
 	pool.query("INSERT INTO public.user_progress (uid, cal_burn, time_spent, on_date) VALUES ($1, $2, $3, $4);",
 		[data.username, data.caloriesBurned, data.timeExercised, data.onDate], callback);
 }

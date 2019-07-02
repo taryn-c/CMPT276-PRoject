@@ -14,7 +14,10 @@
     <div align="left">
     <button class="btn btn-primary pull-right" onclick='window.location.href="/logout"'>
      Logout</button>
+     <button class="btn btn-primary pull-right" onclick='window.location.href="/calories"'>
+      Add Progress</button>
      </div>
+     
      <h3>
       Hi, <%= session.user.fname %>
      </h3>
@@ -27,7 +30,7 @@
       <span onclick="newElement()" class="addBtn">Add</span>
       </form>
     </div>
-  
+
     <ul id="myUL">
       <li>Try me!</li>
     </ul>
@@ -43,8 +46,8 @@
       span.appendChild(txt);
       myNodelist[i].appendChild(span);
     }
-  
-  
+
+
     // Add a "checked" symbol when clicking on a list item
     var list = document.querySelector('ul');
     list.addEventListener('click', function(ev) {
@@ -54,15 +57,15 @@
           ev.target.style.display="none";
           document.getElementById("")
         }, 1000)
-  
+
       }
     }, false);
-  
+
     // Create a new list item when clicking on the "Add" button
     function newElement() {
       var li = document.createElement("li");
       var inputValue = document.getElementById("myInput").value;
-      
+
       var t = document.createTextNode(inputValue);
       li.appendChild(t);
       if (inputValue === '') {
@@ -71,16 +74,16 @@
         document.getElementById("myUL").appendChild(li);
         count++;
         document.getElementById("newGoal").submit();
-  
+
       }
       document.getElementById("myInput").value = "";
-  
+
       var span = document.createElement("SPAN");
       var txt = document.createTextNode("\u00D7");
       span.className = "close";
       span.appendChild(txt);
       li.appendChild(span);
-  
+
       for (i = 0; i < close.length; i++) {
         close[i].onclick = function() {
           var div = this.parentElement;
