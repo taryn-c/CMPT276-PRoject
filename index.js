@@ -49,6 +49,8 @@ function createUser(data, callback) {
 		calorie = calorie + data.fit_goal;
 		}
 
+	
+
 		maintcal = parseInt(calorie);
 
 	var goalcount = 0;
@@ -119,6 +121,8 @@ function statUserByUsername(username, callback) {
 	});
 }
 
+
+
 function loginRequired(req, res, next) {
   if (!req.session.user) {
     return res.render('pages/login')
@@ -127,21 +131,22 @@ function loginRequired(req, res, next) {
   next();
 }
 
-// Creates daily goals
-function createGoal(data, callback){
-	if (data.goal == null) return callback('Error: goal is empty');
 
-	// TODO:
-	// Insert goal data in table dailygoal(username, goalnum, goal)
+function getUserGoals(data, callback){
+
+	pool.query("select goalnum, goal from dailygoal where username=$1", [data.username], function(error, result){
+		if (error){
+			return callback(error);
+		}
+
+	if(result.rowCount > 0){
+		callback(null, result.rows);
+	}
+	else{
+		callback(null,null);
+	}
+	});
 }
-
-// Deletes daily goals
-function removeGoal(data, callback){
-
-	pool.query("DELETE FROM dailygoal WHERE ")
-}
-
-
 // Create web server
 
 
@@ -188,6 +193,13 @@ app.post("/api/login", function(req, res) {
 			console.error(error);
 			return;
 		}
+	getUserGoals(req.body, function(error, dailygoal){
+		if(error){
+			res.status(400);
+			console.error(error);
+			return;
+		}
+		console.log(dailygoal);
 
 		// Create session
 		req.session.loginid = data.id;
@@ -197,7 +209,9 @@ app.post("/api/login", function(req, res) {
 			lname: data.lastname,
 			calorie: data.calorie,
 			username: data.username,
-			goalcount: data.goalcount
+			goalcount: data.goalcount,
+			goals: dailygoal
+	
 		}
 
 		//Redirect
@@ -210,8 +224,9 @@ app.post("/api/login", function(req, res) {
 				res.redirect('/');
 			}
 		}
-	})
+	});
 });
+})
 
 app.get('/logout', function(req, res, next) {
   if (req.session) {
@@ -283,14 +298,56 @@ app.get('/deleteuser/:id', async (req, res) => {
       res.send("Error " + err);
     }
 });
+
+
+
+
 //////////////////////////////////////////////////////////////////////////////////////////////////////////
-app.post('/api/addGoal', function(req,res) {
-	createGoal(req.body, function(error, data){
-		if (error){
-			res.status(400);
-			res.send("Query failed");
-			console.error(error);
-			return;
+app.post('/api/addGoal', function(req,res){
+	try {
+		// TODO:
+		// Insert goal data in table dailygoal(username, goalnum, goal)
+	
+		console.log(req.body.goalcount1);
+		
+		pool.query('INSERT INTO dailygoal(username, goalnum, goal) VALUES($1,$2,$3);',[req.body.username,req.body.goalcount1,req.body.goal],function(err){
+			if(err){
+				console.log(err);
+			}
+		});
+		pool.query('UPDATE users SET goalcount = $1 WHERE username = $2;',[req.body.goalcount1, req.body.username],function(err){
+			if(err){
+				console.log(err);
+			}
+		});
+	}
+	catch(err){
+		console.log(err);
+		res.send("Error " + err);
+	}	
+	return;
+});
+
+
+app.post('/api/deleteGoal', function(req,res){
+
+	try {
+		console.log(req.body.username);
+		console.log(req.body.goalcount);
+			
+			pool.query('DELETE FROM dailygoal WHERE (username = $1 AND goalnum = $2);',[req.body.username,req.body.goalcount],function(err){
+				if(err){
+					console.log(err);
+				}
+				console.log("Goal deleted");
+			});
 		}
-	});
+		catch(err){
+			console.log(err);
+			res.send("Error " + err);
+		}
+		
+		
+		
+			
 });

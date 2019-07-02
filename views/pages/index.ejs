@@ -11,28 +11,37 @@
 <main>
   <% include ../partials/styles/index.ejs %>
   <% if (session.login) { %>
+    <p id = "count" style="display: none"><%= session.user.goalcount %></p>
     <div align="left">
     <button class="btn btn-primary pull-right" onclick='window.location.href="/logout"'>
      Logout</button>
      </div>
      <h3>
-      Hi, <%= session.user.fname %>
+      Welcome, <%= session.user.fname %>
      </h3>
 
     <div id="myDIV" class="header">
-      <form id='newGoal' action='/api/addGoal' method="POST">
+      <iframe name="votar" style="display: none"></iframe>
+      <form id='newGoal' action='/api/addGoal' method="POST" target="votar">
       <h2>Today's Fitness Goals</h2>
       <input type="text" id="myInput" name="goal" placeholder="Goal...">
-      <input type="hidden" name="username" value="<%= session.user.username%>">
-      <span onclick="newElement()" class="addBtn">Add</span>
+      <input type="hidden" id = "username" name="username" value="<%= session.user.username%>">
       </form>
+      <span onclick="newElement()" class="addBtn">Add</span>
     </div>
   
     <ul id="myUL">
-      <li>Try me!</li>
+      <% if(session.user.goals != null) { %>
+      <% for(var i = 0; i < session.user.goals.length; i++) { %>   
+        <li id=<%= session.user.goals[i].goalnum %>><%=(session.user.goals[i].goal) %></li>
+      <% }} %>
     </ul>
     <script>
-    var count = 0;
+    var count = parseInt(document.getElementById("count").innerText);
+    console.log("Did it update goalco");
+    console.log(count);
+
+
       // Create a "close" button and append it to each list item
     var myNodelist = document.getElementsByTagName("LI");
     var i;
@@ -49,7 +58,37 @@
     var list = document.querySelector('ul');
     list.addEventListener('click', function(ev) {
       if (ev.target.tagName === 'LI') {
+
+        // Create html form to send
+        var formDel = document.createElement("form");
+        formDel.method="POST";
+        formDel.action="/api/deleteGoal";
+        formDel.name="formDel";
+        formDel.target="votar";
+
+        // Create form input to store goal value to be deleted
+        var goalDel = document.createElement("input");
+        goalDel.type="hidden";
+        goalDel.name="goal";
+        goalDel.value=ev.target.value;
+
+        var goalNum = document.createElement("input");
+        goalNum.type="hidden";
+        goalNum.name="goalcount";
+        goalNum.value=ev.target.id;
+
+        var username = document.getElementById("username");
+
+
         ev.target.classList.toggle('checked');
+
+        formDel.appendChild(goalDel);
+        formDel.appendChild(goalNum);
+        formDel.appendChild(username);
+        document.body.appendChild(formDel);
+        formDel.submit();
+
+
         setTimeout(()=>{
           ev.target.style.display="none";
           document.getElementById("")
@@ -60,6 +99,7 @@
   
     // Create a new list item when clicking on the "Add" button
     function newElement() {
+
       var li = document.createElement("li");
       var inputValue = document.getElementById("myInput").value;
       
@@ -68,9 +108,19 @@
       if (inputValue === '') {
         alert("You must write something!");
       } else {
+        ++count;
+        li.id = count;
+        console.log(count);
         document.getElementById("myUL").appendChild(li);
-        count++;
-        document.getElementById("newGoal").submit();
+        goalcount = document.createElement("input");
+        goalcount.type="hidden";
+        goalcount.value = count;
+        goalcount.name="goalcount1";
+
+        var frm = document.getElementById("newGoal");
+        frm.appendChild(goalcount);
+        frm.submit();
+
   
       }
       document.getElementById("myInput").value = "";
@@ -88,13 +138,14 @@
         }
       }
     }
+
     </script>
 
     <div id="cal">
-      <h3>Calorie count for your specified goals!</h3>
+      <h3>Calories per day to sustain your goal:</h3>
       <h4><%= session.user.calorie %></h4>
     </div>
-    <% } else{ %>
+    <% } else { %>
 
 <a href="register">Click here to register</a><br>
 <a href="login">Click here to login</a>
