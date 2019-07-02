@@ -58,14 +58,16 @@ function createUser(data, callback) {
 }
 
 function addProgress(data, callback) {
+  if (data.caloriesConsumed == null) return callback('addProgress missing caloriesConsumed');
 	if (data.caloriesBurned == null) return callback('addProgress missing caloriesBurned');
 	if (data.timeExercised == null) return callback('addProgress missing timeExercised');
 	if (data.onDate == null) return callback('addProgress missing onDate');
+  if (data.currentWeight == null) return callback('addProgress missing currentWeight');
 	if (data.username == null) return callback('addProgress missing username');
 
   // To do: add cookie to track current user's username, so no re-entry required
-	pool.query("INSERT INTO public.user_progress (uid, cal_burn, time_spent, on_date) VALUES ($1, $2, $3, $4);",
-		[data.username, data.caloriesBurned, data.timeExercised, data.onDate], callback);
+	pool.query("INSERT INTO public.user_progress (uid, cal_burn, time_spent, on_date, cal_cons, weight) VALUES ($1, $2, $3, $4, $5, $6);",
+		[data.username, data.caloriesBurned, data.timeExercised, data.onDate, data.caloriesConsumed, data.currentWeight], callback);
 }
 
 function loginUser(data, callback) {

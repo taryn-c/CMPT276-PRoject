@@ -14,6 +14,9 @@
           <form action="/api/calories" method="POST">
               <h2 class="text-center">Input Workout Info</h2>
               <div class="form-group">
+                <input type="number" class="form-control" name="caloriesConsumed" placeholder="Calories-consumed" required>
+              </div>
+              <div class="form-group">
                 <input type="number" class="form-control" name="caloriesBurned" placeholder="Calories-burned" required>
               </div>
               <div class="form-group">
@@ -22,6 +25,9 @@
               <div class="form-group">
                 Date taken place:
                 <input type="date" class="form-control" name="onDate" required>
+              </div>
+              <div class="form-group">
+                <input type="number" class="form-control" name="currentWeight" placeholder="Current Weight (lbs)" step="0.01" required>
               </div>
               <div class="form-group">
                 <input type="text" class="form-control" name="username" placeholder="Username to verify" required>
