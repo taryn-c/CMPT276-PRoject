@@ -47,7 +47,7 @@ function createUser(data, callback) {
 		calorie = calorie + data.fit_goal;
 		}
 
-	
+
 
 		maintcal = parseInt(calorie);
 
@@ -178,7 +178,7 @@ app.set('view engine', 'ejs')
 app.get('/', loginRequired,(req, res) => res.render('pages/index', {session:req.session}))
 app.get('/login', (req, res) => res.render('pages/login'))
 app.get('/register', (req, res) => res.render('pages/register'))
-app.get('/calories', loginRequired, (req, res) => res.render('pages/calories'))
+app.get('/calories', loginRequired, (req, res) => res.render('pages/calories', {session:req.session}))
 app.listen(PORT, () => console.log(`Listening on ${ PORT }`))
 
 
@@ -222,7 +222,7 @@ app.post("/api/login", function(req, res) {
 			username: data.username,
 			goalcount: data.goalcount,
 			goals: dailygoal
-	
+
 		}
 
 		//Redirect
@@ -331,9 +331,9 @@ app.post('/api/addGoal', function(req,res){
 	try {
 		// TODO:
 		// Insert goal data in table dailygoal(username, goalnum, goal)
-	
+
 		console.log(req.body.goalcount1);
-		
+
 		pool.query('INSERT INTO dailygoal(username, goalnum, goal) VALUES($1,$2,$3);',[req.body.username,req.body.goalcount1,req.body.goal],function(err){
 			if(err){
 				console.log(err);
@@ -348,7 +348,7 @@ app.post('/api/addGoal', function(req,res){
 	catch(err){
 		console.log(err);
 		res.send("Error " + err);
-	}	
+	}
 	return;
 });
 
@@ -358,7 +358,7 @@ app.post('/api/deleteGoal', function(req,res){
 	try {
 		console.log(req.body.username);
 		console.log(req.body.goalcount);
-			
+
 			pool.query('DELETE FROM dailygoal WHERE (username = $1 AND goalnum = $2);',[req.body.username,req.body.goalcount],function(err){
 				if(err){
 					console.log(err);
@@ -370,8 +370,8 @@ app.post('/api/deleteGoal', function(req,res){
 			console.log(err);
 			res.send("Error " + err);
 		}
-		
-		
-		
-			
+
+
+
+
 });
