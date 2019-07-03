@@ -24,6 +24,11 @@ const ADMIN_LEVEL_SUPER_ADMIN = 2;
 //  database: process.env.DB_DATABASE || 'postgres'
 //  });
 
+
+/*
+Creates user and queries data into user table
+*/
+
 function createUser(data, callback) {
 	if (data.username == null) return callback('createUser missing username in 2nd argument');
 	if (data.password == null) return callback('createUser missing password in 2nd argument');
@@ -38,12 +43,12 @@ function createUser(data, callback) {
 	if (data.fit_goal == null) return callback('createUser missing fit_goal in 2nd argument');
 
 	if(data.gender == 'male'){
-		var calorie = (66.47 + (13.7 *data.weight) + (5 * data.height) - (6.8*data.age))
+		var calorie = (10.0 * (2.220 * data.weight) + (6.25 * data.height) - (5*data.age) + 5)
 		calorie = (calorie*data.activity_level)
 		calorie = calorie + data.fit_goal;
 		}
 	else if (data.gender == 'female'){
-		var calorie = (655.1 + (9.6 *data.weight) + (1.8 * data.height) - (4.7*data.age))
+		var calorie = (10* (2.220 * data.weight) + (6.25 * data.height) - (5*data.age) - 161)
 		calorie = (calorie*data.activity_level)
 		calorie = calorie + data.fit_goal;
 		}
@@ -59,6 +64,11 @@ function createUser(data, callback) {
 	pool.query("INSERT INTO public.users(username, password, firstname, lastname, email, age, weight, height, gender, activity_level, fit_goal, calorie, goalcount) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13);",
 		[data.username, data.password, data.firstname, data.lastname, data.email, data.age, data.weight, data.height, data.gender, data.activity_level, data.fit_goal, maintcal, goalcount], callback);
 }
+
+
+/*
+Add calorie progress for user on each day
+*/
 
 function addProgress(data, callback) {
   if (data.caloriesConsumed == null) return callback('addProgress missing caloriesConsumed');
@@ -91,6 +101,10 @@ function loginUser(data, callback) {
 	});
 }
 
+
+/*
+FOR ADMIN USE: Displays statistics for User
+*/
 function statUser(data, callback) {
 	let id = (typeof data === 'number') ? data : (data.loginid == null ? data.id : data.loginid);
 	if (id != null) {
@@ -105,6 +119,9 @@ function statUser(data, callback) {
 	throw new Error("Unknown user lookup key provided to statUser");
 }
 
+/*
+FOR ADMIN USE: Displays statistics for all Users by ID
+*/
 function statUserById(id, callback) {
 	pool.query("select * from users where id=$1", [id], function(error, result){
 		if (error){
@@ -119,6 +136,9 @@ function statUserById(id, callback) {
 	});
 }
 
+/*
+FOR ADMIN USE: Displays statistics for User by username
+*/
 function statUserByUsername(username, callback) {
 	pool.query("select * from users where username=$1", [username], function(error, result){
 		if (error){
@@ -179,7 +199,7 @@ app.set('view engine', 'ejs')
 app.get('/', loginRequired,(req, res) => res.render('pages/index', {session:req.session}))
 app.get('/login', (req, res) => res.render('pages/login'))
 app.get('/register', (req, res) => res.render('pages/register'))
-app.get('/calories', loginRequired, (req, res) => res.render('pages/calories'))
+app.get('/calories', loginRequired, (req, res) => res.render('pages/calories', {session:req.session}))
 app.listen(PORT, () => console.log(`Listening on ${ PORT }`))
 
 
@@ -211,8 +231,6 @@ app.post("/api/login", function(req, res) {
 			console.error(error);
 			return;
 		}
-		console.log(dailygoal);
-
 		// Create session
 		req.session.loginid = data.id;
 		req.session.login = true;
@@ -330,11 +348,7 @@ app.get('/deleteuser/:id', async (req, res) => {
 //////////////////////////////////////////////////////////////////////////////////////////////////////////
 app.post('/api/addGoal', function(req,res){
 	try {
-		// TODO:
-		// Insert goal data in table dailygoal(username, goalnum, goal)
-
-		console.log(req.body.goalcount1);
-
+			
 		pool.query('INSERT INTO dailygoal(username, goalnum, goal) VALUES($1,$2,$3);',[req.body.username,req.body.goalcount1,req.body.goal],function(err){
 			if(err){
 				console.log(err);
@@ -357,9 +371,7 @@ app.post('/api/addGoal', function(req,res){
 app.post('/api/deleteGoal', function(req,res){
 
 	try {
-		console.log(req.body.username);
-		console.log(req.body.goalcount);
-
+			
 			pool.query('DELETE FROM dailygoal WHERE (username = $1 AND goalnum = $2);',[req.body.username,req.body.goalcount],function(err){
 				if(err){
 					console.log(err);
@@ -371,7 +383,6 @@ app.post('/api/deleteGoal', function(req,res){
 			console.log(err);
 			res.send("Error " + err);
 		}
-
-
+			
 });
 module.exports = app;
