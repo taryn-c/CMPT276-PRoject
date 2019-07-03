@@ -10,15 +10,11 @@
 
 <main>
   <% include ../partials/styles/index.ejs %>
+  <% include ../partials/navuser.ejs %>
   <% if (session.login) { %>
     <p id = "count" style="display: none"><%= session.user.goalcount %></p>
     <div align="left">
-    <button class="btn btn-primary pull-right" onclick='window.location.href="/logout"'>
-     Logout</button>
-     <button class="btn btn-primary pull-right" onclick='window.location.href="/calories"'>
-      Add Progress</button>
-     </div>
-     
+
      <h3>
       Welcome, <%= session.user.fname %>
      </h3>
@@ -35,7 +31,7 @@
 
     <ul id="myUL">
       <% if(session.user.goals != null) { %>
-      <% for(var i = 0; i < session.user.goals.length; i++) { %>   
+      <% for(var i = 0; i < session.user.goals.length; i++) { %>
         <li id=<%= session.user.goals[i].goalnum %>><%=(session.user.goals[i].goal) %></li>
       <% }} %>
     </ul>
@@ -124,7 +120,7 @@
         frm.appendChild(goalcount);
         frm.submit();
 
-  
+
       }
       document.getElementById("myInput").value = "";
 
