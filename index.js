@@ -2,6 +2,7 @@ const express = require('express')
 const path = require('path')
 const expressSession = require('express-session')
 var cors = require('cors')
+var assert= require('assert')
 const PORT = process.env.PORT || 8080
 const Pool = require('pg').Pool;
 
@@ -63,6 +64,8 @@ function createUser(data, callback) {
 	// if (data.username == pool.query(select * from users where username == data.username))
 	pool.query("INSERT INTO public.users(username, password, firstname, lastname, email, age, weight, height, gender, activity_level, fit_goal, calorie, goalcount) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13);",
 		[data.username, data.password, data.firstname, data.lastname, data.email, data.age, data.weight, data.height, data.gender, data.activity_level, data.fit_goal, maintcal, goalcount], callback);
+
+
 }
 
 
@@ -276,7 +279,7 @@ app.get('/admin', loginRequired, async (req, res) => {
       const client = await pool.connect();
       const result = await client.query('SELECT * FROM users order by lastname', function(error, result){
         const results = { 'results': (result) ? result.rows : null};
-        res.render('pages/admin', results );
+        res.render('pages/admin', results)
         client.release();
       });
     }catch (err) {
@@ -335,7 +338,7 @@ app.get('/deleteuser/:id', async (req, res) => {
 //////////////////////////////////////////////////////////////////////////////////////////////////////////
 app.post('/api/addGoal', function(req,res){
 	try {
-			
+
 		pool.query('INSERT INTO dailygoal(username, goalnum, goal) VALUES($1,$2,$3);',[req.body.username,req.body.goalcount1,req.body.goal],function(err){
 			if(err){
 				console.log(err);
@@ -358,7 +361,7 @@ app.post('/api/addGoal', function(req,res){
 app.post('/api/deleteGoal', function(req,res){
 
 	try {
-			
+
 			pool.query('DELETE FROM dailygoal WHERE (username = $1 AND goalnum = $2);',[req.body.username,req.body.goalcount],function(err){
 				if(err){
 					console.log(err);
@@ -370,6 +373,6 @@ app.post('/api/deleteGoal', function(req,res){
 			console.log(err);
 			res.send("Error " + err);
 		}
-			
+
 });
 module.exports = app;

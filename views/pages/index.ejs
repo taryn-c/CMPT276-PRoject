@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <% include ../partials/head.ejs %>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
 </head>
 
 <body>
@@ -14,14 +14,11 @@
     <p id = "count" style="display: none"><%= session.user.goalcount %></p>
     <div align="left">
 
-     <h3>
-      Welcome, <%= session.user.fname %>
-     </h3>
 
     <div id="myDIV" class="header">
       <iframe name="votar" style="display: none"></iframe>
       <form id='newGoal' action='/api/addGoal' method="POST" target="votar">
-      <h2>Today's Fitness Goals</h2>
+      <h2><%= session.user.fname%>'s Fitness Goals Today</h2>
       <input type="text" id="myInput" name="goal" placeholder="Goal...">
       <input type="hidden" id = "username" name="username" value="<%= session.user.username%>">
       </form>
