@@ -11,18 +11,18 @@ const ADMIN_LEVEL_SUPER_ADMIN = 2;
 
 //Connect to Postgres database
 
-//  var pool = new Pool({
-//  connectionString: process.env.DATABASE_URL, ssl: true
-// });
+ var pool = new Pool({
+ connectionString: process.env.DATABASE_URL, ssl: true
+});
 
 
 
-var pool = new Pool({
- user: process.env.DB_USER || 'postgres',
- password: process.env.DB_PASS || 'root',
- host: process.env.DB_HOST || 'localhost',
- database: process.env.DB_DATABASE || 'postgres'
- });
+// var pool = new Pool({
+//  user: process.env.DB_USER || 'postgres',
+//  password: process.env.DB_PASS || 'root',
+//  host: process.env.DB_HOST || 'localhost',
+//  database: process.env.DB_DATABASE || 'postgres'
+//  });
 
 
 /*
@@ -90,6 +90,10 @@ function loginUser(data, callback) {
 	pool.query("select * from users where username=$1", [data.username], function(error, result){
 		if (error){
 			return callback(error);
+		}
+		if (result.rowCount == 0){
+			callback("Invalid user/password", null);
+			return;
 		}
 
 		if (result.rows[0].password != data.password){
