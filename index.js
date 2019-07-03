@@ -124,23 +124,6 @@ function statUser(data, callback) {
 }
 
 /*
-FOR ADMIN USE: Displays statistics for all Users by ID
-*/
-function statUserById(id, callback) {
-	pool.query("select * from users where id=$1", [id], function(error, result){
-		if (error){
-			return callback(error);
-		}
-
-		if (result.rows.length == 0) {
-			return callback("Unknown user id " + id);
-		}
-
-		callback(null, result.rows[0]);
-	});
-}
-
-/*
 FOR ADMIN USE: Displays statistics for User by username
 */
 function statUserByUsername(username, callback) {
@@ -225,7 +208,7 @@ app.post("/api/login", function(req, res) {
 	loginUser(req.body, function (error, data) {
 		if (error) {
 			res.status(400);
-			res.send((typeof error === "string") ? error: 'ERROR. This user is not registered. Please create account.');
+			res.render('pages/loginerror');
 			console.error(error);
 			return;
 		}
