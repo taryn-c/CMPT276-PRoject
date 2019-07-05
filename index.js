@@ -248,7 +248,7 @@ app.post("/api/login", function(req, res) {
 });
 })
 
-app.post('/api/calories', function(req, res) {
+app.post('/api/calories', loginRequired, function(req, res) {
 	addProgress(req.body, function(error, data) {
 		if (error) {
 			res.status(400);
@@ -323,7 +323,6 @@ app.get('/deleteuser/:id', async (req, res) => {
     try {
       const client = await pool.connect();
       await client.query('delete from users where username=$1',[req.params.id]);
-      //await client.query('delete from backup where id=$1',[req.params.id]);
       res.redirect('pages/admin');
       client.release();
     } catch (err) {
@@ -336,7 +335,7 @@ app.get('/deleteuser/:id', async (req, res) => {
 
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////
-app.post('/api/addGoal', function(req,res){
+app.post('/api/addGoal', loginRequired, function(req,res){
 	try {
 
 		pool.query('INSERT INTO dailygoal(username, goalnum, goal) VALUES($1,$2,$3);',[req.body.username,req.body.goalcount1,req.body.goal],function(err){
@@ -358,7 +357,7 @@ app.post('/api/addGoal', function(req,res){
 });
 
 
-app.post('/api/deleteGoal', function(req,res){
+app.post('/api/deleteGoal', loginRequired, function(req,res){
 
 	try {
 
@@ -376,12 +375,36 @@ app.post('/api/deleteGoal', function(req,res){
 
 });
 
-app.get('/forum-home', function(req, res){
-  res.render('pages/forum');
+app.get('/forum-home', loginRequired, async (req, res)=> {
+    try {
+      const client = await pool.connect();
+      await client.query('select * from topics order by topic_date limit 5', function(error, result){
+        const results = { 'results': (result) ? result.rows : null};
+        res.render('pages/forum', results );
+        client.release();
+      });
+    }catch (err) {
+      console.error(err);
+      res.send("Error " + err);
+    }
 });
 
-app.get('/addTopic', function(req, res){
+app.get('/addTopic', loginRequired, function(req, res){
   res.render('pages/addTopic');
+});
+
+app.post('/postTopic', loginRequired, async (req, res) => {
+    try {
+      const client = await pool.connect();
+      await client.query("insert into topics(topic_subject, topic_by) values($1, $2)",[req.body.topic, req.session.user.username]);
+      await client.query('insert into posts(post_topic) select topic_id from topics where topic_by=$1',[req.session.username])
+      await client.query('insert into posts(post_content, post_by) values($1, $2)',[req.body.content,req.session.username])
+      res.redirect('/forum-home');
+      client.release();
+    } catch (err) {
+      console.error(err);
+      res.send("Error " + err);
+    }
 });
 
 

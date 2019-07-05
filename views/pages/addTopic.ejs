@@ -10,7 +10,7 @@
   <% include ../partials/navuser.ejs %>
   <br>
   <h4 style="text-align:center; margin-top:1%">Create New Discussion</h4>
-  <div class="container topic-form" style="margin-top:5%; margin-bottom:5%; width:70%"">
+  <div class="container topic-form" style="margin-top:5%; margin-bottom:5%; width:70%">
     <form method="post" action="/postTopic">
       <div class="form-group">
         <label for="topic">Title</label>
@@ -21,7 +21,7 @@
         <textarea style="width: 100%; height: 150px;" id="content" name="content"  class="form-control" placeholder=""></textarea>
       </div>
       <div class="form-group">
-        <input type="submit" name="Submit" class="create" value="Create" />
+        <button type="submit" class="btn btn-info">Create</button>
       </div>
 
     </form>

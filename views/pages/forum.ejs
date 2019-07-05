@@ -15,6 +15,11 @@
      Create New Discussion</button>
     <br>
     <h4 style="margin-top:50px;">Recent Topics</h4>
+    <ul>
+      <%results.forEach(function(topic) { %>
+        <li><%=topic.topic_subject%></li>
+      <%})%>
+    </ul>
   </div>
 
   <div style="float:left; margin-left:300px; margin-top:130px">
