@@ -311,7 +311,7 @@ app.post('/edituser/:id', async (req, res) => {
       [req.body.username, req.body.password, req.body.firstname, req.body.lastname, req.body.email,
       req.body.age, req.body.weight, req.body.height, req.body.gender, req.body.activity_level, req.body.fit_goal, req.params.id]);
 
-      res.redirect('/admin');
+      res.redirect('pages/admin');
       client.release();
     }catch (err) {
       console.error(err);
@@ -324,7 +324,7 @@ app.get('/deleteuser/:id', async (req, res) => {
       const client = await pool.connect();
       await client.query('delete from users where username=$1',[req.params.id]);
       //await client.query('delete from backup where id=$1',[req.params.id]);
-      res.redirect('/admin');
+      res.redirect('pages/admin');
       client.release();
     } catch (err) {
       console.error(err);
@@ -375,4 +375,14 @@ app.post('/api/deleteGoal', function(req,res){
 		}
 
 });
+
+app.get('/forum-home', function(req, res){
+  res.render('pages/forum');
+});
+
+app.get('/addTopic', function(req, res){
+  res.render('pages/addTopic');
+});
+
+
 module.exports = app;
