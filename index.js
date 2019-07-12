@@ -193,7 +193,7 @@ app.get('/', loginRequired,(req, res) => res.render('pages/index', {session:req.
 app.get('/login', (req, res) => res.render('pages/login'))
 app.get('/register', (req, res) => res.render('pages/register'))
 app.get('/calories', loginRequired, (req, res) => res.render('pages/calories', {session:req.session}))
-app.get('/chat', (req, res) => res.render('pages/chat'))
+app.get('/chat', loginRequired, (req, res) => res.render('pages/chat', {session:req.session}))
 // app.listen(PORT, () => console.log(`Listening on ${ PORT }`))
 
 http.listen(PORT, () => console.log(`Listening on ${ PORT }`))
