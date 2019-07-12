@@ -1,8 +1,12 @@
 const express = require('express')
 const path = require('path')
 const expressSession = require('express-session')
+const app = express();
 var cors = require('cors')
 var assert= require('assert')
+var http = require('http').createServer(app);
+var io = require('socket.io')(http);
+
 const PORT = process.env.PORT || 8080
 const Pool = require('pg').Pool;
 
@@ -172,7 +176,6 @@ function getUserGoals(data, callback){
 // Create web server
 
 
-const app = express();
 app.use('/', cors());
 app.use(express.static(path.join(__dirname, 'public')))
 app.use(express.json());
@@ -190,7 +193,18 @@ app.get('/', loginRequired,(req, res) => res.render('pages/index', {session:req.
 app.get('/login', (req, res) => res.render('pages/login'))
 app.get('/register', (req, res) => res.render('pages/register'))
 app.get('/calories', loginRequired, (req, res) => res.render('pages/calories', {session:req.session}))
-app.listen(PORT, () => console.log(`Listening on ${ PORT }`))
+app.get('/chat', (req, res) => res.render('pages/chat'))
+// app.listen(PORT, () => console.log(`Listening on ${ PORT }`))
+
+http.listen(PORT, () => console.log(`Listening on ${ PORT }`))
+
+io.on('connection', function(socket){
+
+  socket.on('chat message', function(msg){
+    io.emit('chat message', msg);
+  });
+
+});
 
 
 app.post('/api/register', function(req, res) {
@@ -260,6 +274,7 @@ app.post('/api/calories', loginRequired, function(req, res) {
 		res.redirect('/');
 	});
 });
+
 
 app.get('/logout', function(req, res, next) {
   if (req.session) {
