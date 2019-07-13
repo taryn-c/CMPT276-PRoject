@@ -4,9 +4,13 @@ body {
   font-size: 12px;
   color: black;
 }
+
 .btn {
   font-size: 15px;
   font-weight: bold;
 }
 
 /* Nav */
+.navbar-nav {
+	font-size: 16px;
+}
