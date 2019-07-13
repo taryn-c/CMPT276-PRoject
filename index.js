@@ -2,6 +2,7 @@ const express = require('express')
 const path = require('path')
 const expressSession = require('express-session')
 const app = express();
+const crypto = require('crypto');
 var cors = require('cors')
 var assert= require('assert')
 var http = require('http').createServer(app);
@@ -16,7 +17,7 @@ const ADMIN_LEVEL_SUPER_ADMIN = 2;
 
 //Connect to Postgres database
 
- var pool = new Pool({
+var pool = new Pool({
  connectionString: process.env.DATABASE_URL, ssl: true
 });
 
@@ -29,6 +30,12 @@ const ADMIN_LEVEL_SUPER_ADMIN = 2;
 //  database: process.env.DB_DATABASE || 'postgres'
 //  });
 
+// Creates a consistent hash for a username that shouldn't be able to be
+// converted back into the original username within the next 1000 years.
+function usernameHash(username) {
+	var hash = crypto.createHash('sha256');
+	return hash.update(username).digest('hex');
+}
 
 /*
 Creates user and queries data into user table
@@ -175,16 +182,17 @@ function getUserGoals(data, callback){
 }
 // Create web server
 
+var sessionMiddleware = expressSession({
+	resave: false,
+	saveUninitialzed: false,
+	secret: "boom"
+});
 
 app.use('/', cors());
 app.use(express.static(path.join(__dirname, 'public')))
 app.use(express.json());
 app.use(express.urlencoded({extended:false}));
-app.use(expressSession({
-	resave: false,
-	saveUninitialzed: false,
-	secret: "boom"
-}))
+app.use(sessionMiddleware);
 
 app.set('views', path.join(__dirname, 'views'))
 app.set('view engine', 'ejs')
@@ -198,10 +206,19 @@ app.get('/chat', loginRequired, (req, res) => res.render('pages/chat', {session:
 
 http.listen(PORT, () => console.log(`Listening on ${ PORT }`))
 
-io.on('connection', function(socket){
+io.use((socket, next) => {
+	sessionMiddleware(socket.request, socket.request.res, next);
+});
 
+io.on('connection', function(socket){
+  var session = socket.request.session;
   socket.on('chat message', function(msg){
-    io.emit('chat message', msg);
+    io.emit('chat message', {
+    	authorId: session.loginid,
+    	author: `${session.user.fname} ${session.user.lname.substring(0, 1).toUpperCase()}.`,
+    	text: msg,
+    	date: Date.now(),
+    });
   });
 
 });
@@ -236,7 +253,8 @@ app.post("/api/login", function(req, res) {
 			return;
 		}
 		// Create session
-		req.session.loginid = data.id;
+		console.log(data);
+		req.session.loginid = usernameHash(data.username);
 		req.session.login = true;
 		req.session.user = {
 			fname: data.firstname,

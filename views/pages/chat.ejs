@@ -2,84 +2,36 @@
 <html>
 
 <head>
-    <title>GitFit chat</title>
-    <style>
-    * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-    }
-
-    body {
-        font: 13px Helvetica, Arial;
-    }
-
-    h2 {
-      font-size:1.5vw;
-    }
-
-    form {
-        background: #000;
-        padding: 3px;
-        position: fixed;
-        bottom: 0;
-        width: 100%;
-    }
-
-    form input {
-        border: 0;
-        padding: 10px;
-        width: 90%;
-        margin-right: .5%;
-    }
-
-    form button {
-        width: 9%;
-        background: rgb(130, 224, 255);
-        border: none;
-        padding: 10px;
-    }
-
-    #messages {
-        list-style-type: none;
-        margin: 0;
-        padding: 0;
-    }
-
-    #messages li {
-        padding: 5px 10px;
-    }
-
-    #messages li:nth-child(odd) {
-        background: #eee;
-    }
-    </style>
+    <title>GitFit Chat</title>
+    <% include ../partials/head.ejs %>
+    <link rel="stylesheet" href="/stylesheets/chat.css" />
+    <script src="https://code.jquery.com/jquery-1.11.1.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="/scripts/chat.js"></script>
 </head>
 
 <body>
-    <h2>GitFit Community Live Message Chat</h2>
-    <br>
-    <br>
-    <ul id="messages"></ul>
-    <form action="">
-        <input id="m" autocomplete="off" /><button>Send</button>
-    </form>
-    <script src="/socket.io/socket.io.js"></script>
-    <script src="https://code.jquery.com/jquery-1.11.1.js"></script>
-    <script>
-    $(function() {
-        var socket = io();
-        $('form').submit(function(e) {
-            e.preventDefault(); // prevents page reloading
-            socket.emit('chat message', $('#m').val());
-            $('#m').val('');
-            return false;
-        });
-        socket.on('chat message', function(msg) {
-            $('#messages').append($('<li>').text(msg));
-        });
-    });
-    </script>
+    <% include ../partials/navuser.ejs %>
+
+    <template id="message-template">
+        <div class="chat-message">
+            <div class="chat-message-metadata">
+                <div class="chat-message-author"></div>
+                <div class="chat-message-time"></div>
+            </div>
+            <div class="chat-message-text"></div>
+        </div>
+    </template>
+
+    <main id="chat-main">
+        <div id="messages-container">
+            <div id="messages"></div>
+        </div>
+        <form action="" id="chat-form">
+            <input id="chat-box" autocomplete="off" />
+            <button id="chat-submit">Send</button>
+        </form>
+    </main>
 </body>
 
 </html>
