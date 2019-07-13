@@ -2,6 +2,7 @@ const express = require('express')
 const path = require('path')
 const expressSession = require('express-session')
 const app = express();
+const crypto = require('crypto');
 var cors = require('cors')
 var assert= require('assert')
 var http = require('http').createServer(app);
@@ -16,9 +17,9 @@ const ADMIN_LEVEL_SUPER_ADMIN = 2;
 
 //Connect to Postgres database
 
-//  var pool = new Pool({
-//  connectionString: process.env.DATABASE_URL, ssl: true
-// });
+ var pool = new Pool({
+ connectionString: process.env.DATABASE_URL, ssl: true
+});
 
 
 
@@ -39,13 +40,19 @@ dailygoal(username REFERENCES users:username, goalnum:int, goal:text)
 */
 
 
-var pool = new Pool({
- user: process.env.DB_USER || 'postgres',
- password: process.env.DB_PASS || 'root',
- host: process.env.DB_HOST || 'localhost',
- database: process.env.DB_DATABASE || 'postgres'
- });
+// var pool = new Pool({
+//  user: process.env.DB_USER || 'postgres',
+//  password: process.env.DB_PASS || 'root',
+//  host: process.env.DB_HOST || 'localhost',
+//  database: process.env.DB_DATABASE || 'postgres'
+//  });
 
+// Creates a consistent hash for a username that shouldn't be able to be
+// converted back into the original username within the next 1000 years.
+function usernameHash(username) {
+	var hash = crypto.createHash('sha256');
+	return hash.update(username).digest('hex');
+}
 
 /*
 Creates user and queries data into user table
@@ -177,16 +184,17 @@ function loginRequired(req, res, next) {
 
 // Create web server
 
+var sessionMiddleware = expressSession({
+	resave: false,
+	saveUninitialzed: false,
+	secret: "boom"
+});
 
 app.use('/', cors());
 app.use(express.static(path.join(__dirname, 'public')))
 app.use(express.json());
 app.use(express.urlencoded({extended:false}));
-app.use(expressSession({
-	resave: false,
-	saveUninitialzed: false,
-	secret: "boom"
-}))
+app.use(sessionMiddleware);
 
 app.set('views', path.join(__dirname, 'views'))
 app.set('view engine', 'ejs')
@@ -202,10 +210,49 @@ app.get('/profile', loginRequired, (req, res) => res.render('pages/profile', {se
 
 http.listen(PORT, () => console.log(`Listening on ${ PORT }`))
 
-io.on('connection', function(socket){
+io.use((socket, next) => {
+	sessionMiddleware(socket.request, socket.request.res, next);
+});
 
+var chat_clients = {};
+io.on('connection', function(socket) {
+  if (socket.request.session.login !== true) {
+  	socket.disconnect("This feature requires login.");
+  	return;
+  }
+
+  var session = socket.request.session;
+  var client = chat_clients[session.loginid] = {
+  	authorId: session.loginid,
+  	author: `${session.user.fname} ${session.user.lname.substring(0, 1).toUpperCase()}.`
+  };
+
+  // When the user connects, send them the user list.
+  socket.emit('user list', chat_clients);
+
+  // When the user sends a message, forward it.
   socket.on('chat message', function(msg){
-    io.emit('chat message', msg);
+    io.emit('chat message', {
+  		...client,
+    	text: msg,
+    	date: Date.now(),
+    });
+  });
+
+  // When the user connects, send a join message to all other clients.
+  io.emit('user joined', {
+  		...client,
+    	date: Date.now(),
+  });
+
+  // When the user disconnects, send a leave message to all other clients.
+  socket.on('disconnect', function(reason) {
+  	io.emit('user left', {
+  		...client,
+    	date: Date.now(),
+  	});
+
+  	delete chat_clients[session.loginid];
   });
 
 });
@@ -253,7 +300,7 @@ app.post("/api/login", function(req, res) {
 			}
 		
 		// Create session
-		req.session.loginid = data.id;
+		req.session.loginid = usernameHash(data.username);
 		req.session.login = true;
 		req.session.user = {
 			fname: data.firstname,
