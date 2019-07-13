@@ -1,0 +1,53 @@
+<!doctype html>
+<html>
+
+<head>
+    <title>GitFit Chat</title>
+    <% include ../partials/head.ejs %>
+    <link rel="stylesheet" href="/stylesheets/chat.css" />
+    <script src="https://code.jquery.com/jquery-1.11.1.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="/scripts/chat.js"></script>
+</head>
+
+<body>
+    <% include ../partials/navuser.ejs %>
+
+    <template id="message-template">
+        <div class="chat-message">
+            <div class="chat-message-metadata">
+                <div class="chat-message-author"></div>
+                <div class="chat-message-time"></div>
+            </div>
+            <div class="chat-message-text"></div>
+        </div>
+    </template>
+
+    <template id="status-template">
+        <div class="chat-status">
+            <div class="chat-status-metadata">
+                <div class="chat-status-author"></div>
+                <div class="chat-status-time"></div>
+            </div>
+            <div class="chat-status-text"></div>
+        </div>
+    </template>
+
+    <main id="chat-main">
+        <div id="chat-body">
+            <div id="messages-container">
+                <div id="messages"></div>
+            </div>
+            <div id="chat-users">
+                <strong>Users:</strong>
+                <ul id="users"></ul>
+            </div>
+        </div>
+        <form action="" id="chat-form">
+            <input id="chat-box" autocomplete="off" />
+            <button id="chat-submit">Send</button>
+        </form>
+    </main>
+</body>
+
+</html>
