@@ -383,6 +383,7 @@ app.get('/forum-home', loginRequired, async (req, res)=> {
         res.render('pages/forum', results );
         client.release();
       });
+
     }catch (err) {
       console.error(err);
       res.send("Error " + err);
