@@ -16,18 +16,35 @@ const ADMIN_LEVEL_SUPER_ADMIN = 2;
 
 //Connect to Postgres database
 
- var pool = new Pool({
- connectionString: process.env.DATABASE_URL, ssl: true
-});
+//  var pool = new Pool({
+//  connectionString: process.env.DATABASE_URL, ssl: true
+// });
 
 
 
-// var pool = new Pool({
-//  user: process.env.DB_USER || 'postgres',
-//  password: process.env.DB_PASS || 'root',
-//  host: process.env.DB_HOST || 'localhost',
-//  database: process.env.DB_DATABASE || 'postgres'
-//  });
+// DATABASE SCHEMAS Version 1: 07-12
+/*
+users(username, password, firstname, lastname, email, height, weight, calorie
+	gender, activity_level, fit_goal, age, goalcount, userImage)
+
+user_progress(uid, cal_burn, time_spent, on_date, cal_cons, weight)
+
+request(rec:text REFERENCES users:username, sent:text REFERENCES users:username, message:text)
+
+friendslist(f1:text REFERENCES users:username, f2:text REFERENCES users:username)
+
+dailygoal(username REFERENCES users:username, goalnum:int, goal:text)
+
+
+*/
+
+
+var pool = new Pool({
+ user: process.env.DB_USER || 'postgres',
+ password: process.env.DB_PASS || 'root',
+ host: process.env.DB_HOST || 'localhost',
+ database: process.env.DB_DATABASE || 'postgres'
+ });
 
 
 /*
@@ -158,21 +175,6 @@ function loginRequired(req, res, next) {
 }
 
 
-function getUserGoals(data, callback){
-
-	pool.query("select goalnum, goal from dailygoal where username=$1", [data.username], function(error, result){
-		if (error){
-			return callback(error);
-		}
-
-	if(result.rowCount > 0){
-		callback(null, result.rows);
-	}
-	else{
-		callback(null,null);
-	}
-	});
-}
 // Create web server
 
 
@@ -194,6 +196,8 @@ app.get('/login', (req, res) => res.render('pages/login'))
 app.get('/register', (req, res) => res.render('pages/register'))
 app.get('/calories', loginRequired, (req, res) => res.render('pages/calories', {session:req.session}))
 app.get('/chat', loginRequired, (req, res) => res.render('pages/chat', {session:req.session}))
+app.get('/profile', loginRequired, (req, res) => res.render('pages/profile', {session:req.session}))
+
 // app.listen(PORT, () => console.log(`Listening on ${ PORT }`))
 
 http.listen(PORT, () => console.log(`Listening on ${ PORT }`))
@@ -235,6 +239,19 @@ app.post("/api/login", function(req, res) {
 			console.error(error);
 			return;
 		}
+	getFriendList(req.body, function(error, friends){
+		if(error){
+			res.status(400);
+			console.error(error);
+			return;
+		}
+	getFriendRequest(req.body, function(error, requests){
+		if(error){
+			res.status(400);
+			console.error(error);
+			return;
+			}
+		
 		// Create session
 		req.session.loginid = data.id;
 		req.session.login = true;
@@ -244,22 +261,31 @@ app.post("/api/login", function(req, res) {
 			calorie: data.calorie,
 			username: data.username,
 			goalcount: data.goalcount,
-			goals: dailygoal
+			userImage: data.userImage,
+			goals: dailygoal,
+			friendsList: friends,
+			friendReq: requests
 
 		}
 
 		//Redirect
-		if (req.body.redirect != null){
+		if (req.body.redirect != null)
+		{
 			res.redirect(req.body.redirect)
-		} else{
+		} 
+		else
+		{
 			if (data.adminlevel >= ADMIN_LEVEL_REGULAR_ADMIN) {
 				res.redirect('/admin');
-			} else {
+			} 
+			else {
 				res.redirect('/');
 			}
 		}
 	});
-});
+	});
+	});
+	});
 })
 
 app.post('/api/calories', loginRequired, function(req, res) {
@@ -424,3 +450,51 @@ app.post('/postTopic', loginRequired, async (req, res) => {
 
 
 module.exports = app;
+
+function getFriendRequest(data, callback){
+
+	pool.query("select sent from request where rec=$1", [data.username], function(error, result){
+		if (error){
+			return callback(error);
+		}
+
+	if(result.rowCount > 0){
+		callback(null, result.rows);
+	}
+	else{
+		callback(null,null);
+	}
+	});
+}
+
+
+function getUserGoals(data, callback){
+
+	pool.query("select goalnum, goal from dailygoal where username=$1", [data.username], function(error, result){
+		if (error){
+			return callback(error);
+		}
+
+	if(result.rowCount > 0){
+		callback(null, result.rows);
+	}
+	else{
+		callback(null,null);
+	}
+	});
+}
+function getFriendList(data, callback){
+
+	pool.query("select f2 from friendslist where f1=$1", [data.username], function(error, result){
+		if (error){
+			return callback(error);
+		}
+
+	if(result.rowCount > 0){
+		callback(null, result.rows);
+	}
+	else{
+		callback(null,null);
+	}
+	});
+}
