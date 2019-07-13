@@ -210,15 +210,45 @@ io.use((socket, next) => {
 	sessionMiddleware(socket.request, socket.request.res, next);
 });
 
-io.on('connection', function(socket){
+var chat_clients = {};
+io.on('connection', function(socket) {
+  if (socket.request.session.login !== true) {
+  	socket.disconnect("This feature requires login.");
+  	return;
+  }
+
   var session = socket.request.session;
+  var client = chat_clients[session.loginid] = {
+  	authorId: session.loginid,
+  	author: `${session.user.fname} ${session.user.lname.substring(0, 1).toUpperCase()}.`
+  };
+
+  // When the user connects, send them the user list.
+  socket.emit('user list', chat_clients);
+
+  // When the user sends a message, forward it.
   socket.on('chat message', function(msg){
     io.emit('chat message', {
-    	authorId: session.loginid,
-    	author: `${session.user.fname} ${session.user.lname.substring(0, 1).toUpperCase()}.`,
+  		...client,
     	text: msg,
     	date: Date.now(),
     });
+  });
+
+  // When the user connects, send a join message to all other clients.
+  io.emit('user joined', {
+  		...client,
+    	date: Date.now(),
+  });
+
+  // When the user disconnects, send a leave message to all other clients.
+  socket.on('disconnect', function(reason) {
+  	io.emit('user left', {
+  		...client,
+    	date: Date.now(),
+  	});
+
+  	delete chat_clients[session.loginid];
   });
 
 });
@@ -253,7 +283,6 @@ app.post("/api/login", function(req, res) {
 			return;
 		}
 		// Create session
-		console.log(data);
 		req.session.loginid = usernameHash(data.username);
 		req.session.login = true;
 		req.session.user = {

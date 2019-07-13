@@ -23,9 +23,25 @@
         </div>
     </template>
 
+    <template id="status-template">
+        <div class="chat-status">
+            <div class="chat-status-metadata">
+                <div class="chat-status-author"></div>
+                <div class="chat-status-time"></div>
+            </div>
+            <div class="chat-status-text"></div>
+        </div>
+    </template>
+
     <main id="chat-main">
-        <div id="messages-container">
-            <div id="messages"></div>
+        <div id="chat-body">
+            <div id="messages-container">
+                <div id="messages"></div>
+            </div>
+            <div id="chat-users">
+                <strong>Users:</strong>
+                <ul id="users"></ul>
+            </div>
         </div>
         <form action="" id="chat-form">
             <input id="chat-box" autocomplete="off" />
