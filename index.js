@@ -172,7 +172,7 @@ function statUserByUsername(username, callback) {
 }
 
 
-
+// Ensures that user is logged in
 function loginRequired(req, res, next) {
   if (!req.session.user) {
     return res.render('pages/login')
@@ -298,7 +298,7 @@ app.post("/api/login", function(req, res) {
 			console.error(error);
 			return;
 			}
-		
+
 		// Create session
 		req.session.loginid = usernameHash(data.username);
 		req.session.login = true;
@@ -319,12 +319,12 @@ app.post("/api/login", function(req, res) {
 		if (req.body.redirect != null)
 		{
 			res.redirect(req.body.redirect)
-		} 
+		}
 		else
 		{
 			if (data.adminlevel >= ADMIN_LEVEL_REGULAR_ADMIN) {
 				res.redirect('/admin');
-			} 
+			}
 			else {
 				res.redirect('/');
 			}
@@ -466,7 +466,7 @@ app.post('/api/deleteGoal', loginRequired, function(req,res){
 app.get('/forum-home', loginRequired, async (req, res)=> {
     try {
       const client = await pool.connect();
-      await client.query('select * from topics order by topic_date limit 5', function(error, result){
+      await client.query('select * from topics left join users on topics.topic_by= users.username order by topic_id desc limit 5', function(error, result){
         const results = { 'results': (result) ? result.rows : null};
         res.render('pages/forum', results );
         client.release();
@@ -485,9 +485,7 @@ app.get('/addTopic', loginRequired, function(req, res){
 app.post('/postTopic', loginRequired, async (req, res) => {
     try {
       const client = await pool.connect();
-      await client.query("insert into topics(topic_subject, topic_by) values($1, $2)",[req.body.topic, req.session.user.username]);
-      await client.query('insert into posts(post_topic) select topic_id from topics where topic_by=$1',[req.session.username])
-      await client.query('insert into posts(post_content, post_by) values($1, $2)',[req.body.content,req.session.username])
+      await client.query("insert into topics(topic_subject, topic_by, topic_content) values($1, $2, $3)",[req.body.topic, req.session.user.username, req.body.content]);
       res.redirect('/forum-home');
       client.release();
     } catch (err) {
@@ -496,8 +494,36 @@ app.post('/postTopic', loginRequired, async (req, res) => {
     }
 });
 
+app.get('/topic/:id', loginRequired, async (req, res) => {
+  try{
+    const client= await pool.connect();
 
-module.exports = app;
+    await client.query("select * from topics full join replies on topics.topic_id=replies.reply_topic where topic_id=$1", [req.params.id], function(error, result){
+        var topic={topic: (result) ? result.rows : null};
+        res.render('pages/topic', topic);
+        client.release();
+    });
+  }catch (err) {
+    console.error(err);
+    res.send("Error " + err);
+  }
+});
+
+app.post('/postReply/:id', async(req, res) =>{
+  try {
+    const client=await pool.connect();
+    await client.query('insert into replies(reply_topic, reply_by) select topic_id, topic_by from topics order by topic_id desc limit 1');
+    await client.query('update replies set reply_content=$1 where reply_id IN (SELECT max(reply_id) FROM replies)',[req.body.reply]);
+    res.redirect('/topic/'+req.params.id);
+    client.release();
+
+  }catch (err){
+    console.error(err);
+    res.send(err);
+  }
+
+});
+
 
 function getFriendRequest(data, callback){
 
@@ -546,3 +572,4 @@ function getFriendList(data, callback){
 	}
 	});
 }
+module.exports = app;

@@ -8,23 +8,30 @@
   <body >
   <% include ../partials/navuser.ejs %>
   <br>
-  <div style="float:left; margin-left:20px">
-    <h3>GitFit Forum</h3>
-    <br>
-    <button type= "button" class="btn btn-info" onclick='window.location.href="/addTopic"'>
-     Create New Discussion</button>
-    <br>
-    <h4 style="margin-top:50px;">Recent Topics</h4>
-    <ul>
-      <%results.forEach(function(topic) { %>
-        <li><%=topic.topic_subject%></li>
-      <%})%>
-    </ul>
-  </div>
+  <div>
+    <div style="float:left; margin-left:20px">
+      <h3>GitFit Forum</h3>
+      <br>
+      <button type= "button" class="btn btn-info" onclick='window.location.href="/addTopic"'>
+       Create New Discussion</button>
+      <br>
+      <h4 style="margin-top:50px;">Recent Topics</h4><br>
+        <%results.forEach(function(topic) { %>
+          <h6 style="margin-left:5px;"><a href="/topic/<%=topic.topic_id%>"> <%=topic.topic_subject%> </a></h6><br>
+        <%})%>
 
-  <div style="float:left; margin-left:300px; margin-top:130px">
-    <br>
-    <h4> My Topics</h4>
+    </div>
+
+    <div style="float:left; margin-top:127px; margin-left:100px;">
+      <br>
+      <h4> My Topics</h4> <br>
+      <%results.forEach(function(r) {
+          if(r.username==r.topic_by){%>
+
+            <h6 style="margin-left:3px;"><a href="/topic/<%=r.topic_id%>"><%=r.topic_subject%></a></h6><br>
+
+        <%}})%>
+    </div>
   </div>
   </body>
 </html>

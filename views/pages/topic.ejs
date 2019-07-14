@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en" >
+  <head>
+    <meta charset="utf-8">
+    <title>Forum</title>
+    <% include ../partials/head.ejs %>
+    <link rel="stylesheet" type="text/css" href="/stylesheets/forum.css" />
+  </head>
+  <body >
+  <% include ../partials/navuser.ejs %>
+
+
+  <div class="info">
+    <br>
+    <h4>Topic: <%=topic[0].topic_subject%> </h4>
+    <p>Posted on <%=topic[0].topic_date%></p>
+  </div>
+
+  <div class="content">
+    <h6><%=topic[0].topic_by%> says:</h6>
+    <p><%=topic[0].topic_content%></p>
+  </div>
+  <div class="reply">
+    <h5>Replies</h5>
+    <div class="container topic-form">
+      <form method="post" action='/postReply/<%=topic[0].topic_id%>'>
+        <div class="form-group">
+          <textarea style="width: 100%; height: 150px;" id="reply" name="reply"  class="form-control" placeholder="Your thoughts..."></textarea>
+        </div>
+        <div class="form-group">
+          <button type="submit" class="btn btn-info">Reply</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <%topic.forEach(function(reply){%>
+
+      <div class="replies">
+        <h6><%=reply.reply_by%> says:</h6>
+        <p><%=reply.reply_content%></p>
+
+      </div>
+
+
+  <%});%>
