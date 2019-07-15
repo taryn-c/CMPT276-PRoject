@@ -16,17 +16,16 @@ const ADMIN_LEVEL_REGULAR_ADMIN = 1;
 const ADMIN_LEVEL_SUPER_ADMIN = 2;
 
 //Connect to Postgres database
-
+/*
  var pool = new Pool({
  connectionString: process.env.DATABASE_URL, ssl: true
 });
 
-
+*/
 
 // DATABASE SCHEMAS Version 1: 07-12
 /*
-users(username, password, firstname, lastname, email, height, weight, calorie
-	gender, activity_level, fit_goal, age, goalcount, userImage)
+users(username, password, firstname, lastname, email, height, weight, calorie, gender, activity_level, fit_goal, age, goalcount, userImage)
 
 user_progress(uid, cal_burn, time_spent, on_date, cal_cons, weight)
 
@@ -40,12 +39,12 @@ dailygoal(username REFERENCES users:username, goalnum:int, goal:text)
 */
 
 
-// var pool = new Pool({
-//  user: process.env.DB_USER || 'postgres',
-//  password: process.env.DB_PASS || 'root',
-//  host: process.env.DB_HOST || 'localhost',
-//  database: process.env.DB_DATABASE || 'postgres'
-//  });
+ var pool = new Pool({
+  user: process.env.DB_USER || 'postgres',
+  password: process.env.DB_PASS || 'root',
+  host: process.env.DB_HOST || 'localhost',
+  database: process.env.DB_DATABASE || 'postgres'
+  });
 
 // Creates a consistent hash for a username that shouldn't be able to be
 // converted back into the original username within the next 1000 years.
@@ -183,13 +182,13 @@ function loginRequired(req, res, next) {
 
 
 // Create web server
-
 var sessionMiddleware = expressSession({
 	resave: false,
 	saveUninitialzed: false,
 	secret: "boom"
 });
 
+// using middleware
 app.use('/', cors());
 app.use(express.static(path.join(__dirname, 'public')))
 app.use(express.json());
@@ -199,12 +198,14 @@ app.use(sessionMiddleware);
 app.set('views', path.join(__dirname, 'views'))
 app.set('view engine', 'ejs')
 
+// serving navigation links
 app.get('/', loginRequired,(req, res) => res.render('pages/index', {session:req.session}))
 app.get('/login', (req, res) => res.render('pages/login'))
 app.get('/register', (req, res) => res.render('pages/register'))
 app.get('/calories', loginRequired, (req, res) => res.render('pages/calories', {session:req.session}))
 app.get('/chat', loginRequired, (req, res) => res.render('pages/chat', {session:req.session}))
 app.get('/profile', loginRequired, (req, res) => res.render('pages/profile', {session:req.session}))
+app.get('/workouts', loginRequired, (req, res) => res.render('pages/workouts', {session:req.session}))
 
 // app.listen(PORT, () => console.log(`Listening on ${ PORT }`))
 
@@ -257,7 +258,6 @@ io.on('connection', function(socket) {
 
 });
 
-
 app.post('/api/register', function(req, res) {
 	createUser(req.body, function(error, data) {
 		if (error) {
@@ -270,7 +270,6 @@ app.post('/api/register', function(req, res) {
 		res.redirect('/');
 	});
 });
-
 
 app.post("/api/login", function(req, res) {
 	loginUser(req.body, function (error, data) {
@@ -348,7 +347,6 @@ app.post('/api/calories', loginRequired, function(req, res) {
 	});
 });
 
-
 app.get('/logout', function(req, res, next) {
   if (req.session) {
     // delete session object
@@ -361,6 +359,7 @@ app.get('/logout', function(req, res, next) {
     });
   }
 });
+
 //////////////////////ADMIN VIEWS//////////////////////////////////////////////////////
 app.get('/admin', loginRequired, async (req, res) => {
     try {

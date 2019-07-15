@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en" >
+  <head>
+    <meta charset="utf-8">
+    <title>Workouts</title>
+    <% include ../partials/head.ejs %>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
+    <link rel="stylesheet" href="/stylesheets/bootstrap.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Montserrat:400,700">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Kaushan+Script">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Droid+Serif:400,700,400italic,700italic">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto+Slab:400,100,300,700">
+    <link rel="stylesheet" href="/fonts/font-awesome.min.css">
+  </head>
+
+  <body id="page-top"></body>
+    <% include ../partials/navuser.ejs %>
+    <br>
+    <header class="masthead" style="background-image:url('.../assets/img/header-bg.jpg');"></header>
+      <section id="portfolio" class="bg-light">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12 text-center">
+                    <h2 class="text-uppercase section-heading">Workout plans</h2>
+                    <h3 class="section-subheading text-muted"><em>Select workout plan based on fitness goal</em></h3>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-sm-6 col-md-4 portfolio-item">
+                    <a class="portfolio-link" data-tassetsoggle="modal" href="#portfolioModal1">
+                        <div class="portfolio-hover" style="background-color: rgba(104,160,245,0.9);">
+                            <div class="portfolio-hover-content"><i class="fa fa-plus fa-3x"></i></div>
+                        </div><img class="img-fluid" src="/img/workout1-thumb.jpg"></a>
+                    <div class="portfolio-caption">
+                        <h4>Gain weight fast</h4>
+                        <p class="text-muted">+1000 calories per day</p>
+                    </div>
+                </div>
+                <div class="col-sm-6 col-md-4 portfolio-item">
+                    <a class="portfolio-link" data-toggle="modal" href="#portfolioModal2">
+                        <div class="portfolio-hover" style="background-color: rgba(104,160,245,0.9);">
+                            <div class="portfolio-hover-content"><i class="fa fa-plus fa-3x"></i></div>
+                        </div><img class="img-fluid" src="/img/workout2-thumb.jpg"></a>
+                    <div class="portfolio-caption">
+                        <h4>Safely gain weight</h4>
+                        <p class="text-muted"><em>+500 calories per day</em></p>
+                    </div>
+                </div>
+                <div class="col-sm-6 col-md-4 portfolio-item">
+                    <a class="portfolio-link" data-toggle="modal" href="#portfolioModal3">
+                        <div class="portfolio-hover" style="background-color: rgba(104,160,245,0.9);">
+                            <div class="portfolio-hover-content"><i class="fa fa-plus fa-3x"></i></div>
+                        </div><img class="img-fluid" src="/img/workout3-thumb.jpg"></a>
+                    <div class="portfolio-caption">
+                        <h4>Maintain weight</h4>
+                        <p class="text-muted">maintain calories per day</p>
+                    </div>
+                </div>
+                <div class="col-sm-6 col-md-4 portfolio-item">
+                    <a class="portfolio-link" data-toggle="modal" href="#portfolioModal4">
+                        <div class="portfolio-hover" style="background-color: rgba(104,160,245,0.9);">
+                            <div class="portfolio-hover-content"><i class="fa fa-plus fa-3x"></i></div>
+                        </div><img class="img-fluid" src="/img/workout4-thumb.jpg"></a>
+                    <div class="portfolio-caption">
+                        <h4>Safely lose weight</h4>
+                        <p class="text-muted"><em>-1000 calories per day</em></p>
+                    </div>
+                </div>
+                <div class="col-sm-6 col-md-4 portfolio-item">
+                    <a class="portfolio-link" data-toggle="modal" href="#portfolioModal5">
+                        <div class="portfolio-hover" style="background-color: rgba(104,160,245,0.9);">
+                            <div class="portfolio-hover-content"><i class="fa fa-plus fa-3x"></i></div>
+                        </div><img class="img-fluid img-fluid" src="/img/workout5-thumb.jpg"></a>
+                    <div class="portfolio-caption">
+                        <h4>Lose weight fast</h4>
+                        <p class="text-muted"><em>+-500 calories per day</em></p>
+                    </div>
+                </div>
+                <div class="col-sm-6 col-md-4 portfolio-item">
+                    <a class="portfolio-link" data-toggle="modal" href="#portfolioModal6">
+                        <div class="portfolio-hover" style="background-color: rgba(104,160,245,0.9);">
+                            <div class="portfolio-hover-content"><i class="fa fa-plus fa-3x"></i></div>
+                        </div><img class="img-fluid" src="/img/workout7-thumb.jpg"></a>
+                    <div class="portfolio-caption">
+                        <h4>General Workout</h4>
+                        <p class="text-muted"></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <div class="modal fade portfolio-modal text-center" role="dialog" tabindex="-1" id="portfolioModal1">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <div class="container">
+                        <div class="row">
+                            <div class="col-lg-8 mx-auto">
+                                <div class="modal-body">
+                                    <h2 class="text-uppercase">Gain Weight Fast</h2>
+                                    <p class="item-intro text-muted">Lorem ipsum dolor sit amet consectetur.</p><img class="img-fluid d-block mx-auto" src="/img/workout1.jpg">
+                                    <p>Use this area to describe your Workout. Lorem ipsum dolor sit amet, consectetur adipisicing elit. Est blanditiis dolorem culpa incidunt minus dignissimos deserunt repellat aperiam quasi sunt officia expedita beatae
+                                        cupiditate, maiores repudiandae, nostrum, reiciendis facere nemo!</p>
+                                    <ul class="list-unstyled">
+                                        <li>Recommended Supplements: </li>
+                                        <li>Duration: weeks</li>
+                                        <li>Time per Workout: minutes</li>
+                                    </ul><button class="btn btn-primary" data-dismiss="modal" type="button"><i class="fa fa-times"></i><span>&nbsp;Close Workout</span></button></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade portfolio-modal text-center" role="dialog" tabindex="-1" id="portfolioModal2">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <div class="container">
+                        <div class="row">
+                            <div class="col-lg-8 mx-auto">
+                                <div class="modal-body">
+                                    <h2 class="text-uppercase">Gain Weight Safely</h2>
+                                    <p class="item-intro text-muted">Lorem ipsum dolor sit amet consectetur.</p><img class="img-fluid d-block mx-auto" src="/img/workout2.jpg">
+                                    <p>Use this area to describe your Workout. Lorem ipsum dolor sit amet, consectetur adipisicing elit. Est blanditiis dolorem culpa incidunt minus dignissimos deserunt repellat aperiam quasi sunt officia expedita beatae
+                                        cupiditate, maiores repudiandae, nostrum, reiciendis facere nemo!</p>
+                                    <ul class="list-unstyled">
+                                        <li>Recommended Supplements: </li>
+                                        <li>Duration: weeks</li>
+                                        <li>Time per Workout: minutes</li>
+                                    </ul><button class="btn btn-primary" data-dismiss="modal" type="button"><i class="fa fa-times"></i><span>&nbsp;Close Workout</span></button></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade portfolio-modal text-center" role="dialog" tabindex="-1" id="portfolioModal3">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <div class="container">
+                        <div class="row">
+                            <div class="col-lg-8 mx-auto">
+                                <div class="modal-body">
+                                    <h2 class="text-uppercase">Maintain Weight</h2>
+                                    <p class="item-intro text-muted">Lorem ipsum dolor sit amet consectetur.</p><img class="img-fluid d-block mx-auto" src="/img/workout3.jpeg">
+                                    <p>Use this area to describe your Workout. Lorem ipsum dolor sit amet, consectetur adipisicing elit. Est blanditiis dolorem culpa incidunt minus dignissimos deserunt repellat aperiam quasi sunt officia expedita beatae
+                                        cupiditate, maiores repudiandae, nostrum, reiciendis facere nemo!</p>
+                                    <ul class="list-unstyled">
+                                        <li>Recommended Supplements: </li>
+                                        <li>Duration: weeks</li>
+                                        <li>Time per Workout: minutes</li>
+                                    </ul><button class="btn btn-primary" data-dismiss="modal" type="button"><i class="fa fa-times"></i><span>&nbsp;Close Workout</span></button></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade portfolio-modal text-center" role="dialog" tabindex="-1" id="portfolioModal4">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <div class="container">
+                        <div class="row">
+                            <div class="col-lg-8 mx-auto">
+                                <div class="modal-body">
+                                    <h2 class="text-uppercase">Lose Weight Safely</h2>
+                                    <p class="item-intro text-muted">Lorem ipsum dolor sit amet consectetur.</p><img class="img-fluid d-block mx-auto" src="/img/workout4.jpg">
+                                    <p>Use this area to describe your Workout. Lorem ipsum dolor sit amet, consectetur adipisicing elit. Est blanditiis dolorem culpa incidunt minus dignissimos deserunt repellat aperiam quasi sunt officia expedita beatae
+                                        cupiditate, maiores repudiandae, nostrum, reiciendis facere nemo!</p>
+                                    <ul class="list-unstyled">
+                                        <li>Recommended Supplements: </li>
+                                        <li>Duration: weeks</li>
+                                        <li>Time per Workout: minutes</li>
+                                    </ul><button class="btn btn-primary" data-dismiss="modal" type="button"><i class="fa fa-times"></i><span>&nbsp;Close Workout</span></button></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade portfolio-modal text-center" role="dialog" tabindex="-1" id="portfolioModal5">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <div class="container">
+                        <div class="row">
+                            <div class="col-lg-8 mx-auto">
+                                <div class="modal-body">
+                                    <h2 class="text-uppercase">Lose Weight Fast</h2>
+                                    <p class="item-intro text-muted">Lorem ipsum dolor sit amet consectetur.</p><img class="img-fluid d-block mx-auto" src="/img/workout5.jpeg">
+                                    <p>Use this area to describe your Workout. Lorem ipsum dolor sit amet, consectetur adipisicing elit. Est blanditiis dolorem culpa incidunt minus dignissimos deserunt repellat aperiam quasi sunt officia expedita beatae
+                                        cupiditate, maiores repudiandae, nostrum, reiciendis facere nemo!</p>
+                                    <ul class="list-unstyled">
+                                        <li>Recommended Supplements: </li>
+                                        <li>Duration: weeks</li>
+                                        <li>Time per Workout: minutes</li>
+                                    </ul><button class="btn btn-primary" data-dismiss="modal" type="button"><i class="fa fa-times"></i><span>&nbsp;Close Workout</span></button></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade portfolio-modal text-center" role="dialog" tabindex="-1" id="portfolioModal6">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <div class="container">
+                        <div class="row">
+                            <div class="col-lg-8 mx-auto">
+                                <div class="modal-body">
+                                    <h2 class="text-uppercase">General Workout</h2>
+                                    <p class="item-intro text-muted">Lorem ipsum dolor sit amet consectetur.</p><img class="img-fluid d-block mx-auto" src="img/workout7.jpg">
+                                    <p>Use this area to describe your Workout. Lorem ipsum dolor sit amet, consectetur adipisicing elit. Est blanditiis dolorem culpa incidunt minus dignissimos deserunt repellat aperiam quasi sunt officia expedita beatae
+                                        cupiditate, maiores repudiandae, nostrum, reiciendis facere nemo!</p>
+                                    <ul class="list-unstyled">
+                                        <li>Recommended Supplements: </li>
+                                        <li>Duration: weeks</li>
+                                        <li>Time per Workout: minutes</li>
+                                    </ul><button class="btn btn-primary" data-dismiss="modal" type="button"><i class="fa fa-times"></i><span>&nbsp;Close Workout</span></button></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="/scripts/jquery.min.js"></script>
+    <script src="/scripts/bootstrap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-easing/1.4.1/jquery.easing.min.js"></script>
+    <script src="/scripts/agency.js"></script>
+  </body>
+</html>
