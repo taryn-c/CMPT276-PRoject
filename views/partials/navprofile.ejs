@@ -16,47 +16,6 @@
             <a class="nav-item nav-link" href="/chat">Chat</a>
             <a class="nav-item nav-link" href="/profile">Profile</a>
             <div style="flex-grow: 1"></div>
-            <a class="nav-item nav-pills" style="margin-right: 10px">
-                <li>
-                    <div class="dropdown">
-                        <button class="btn btn-primary dropdown-toggle right" type="button" data-toggle="dropdown"><i
-                                class="fa fa-user-plus"></i>
-                            <span class="caret"></span></button>
-                        <ul class="dropdown-menu" style="height: 300px; width: 250px; overflow-y: scroll;">
-                            <% if (session.user.incReq != null) { %>
-                            <% for(var i = 0; i < session.user.incReq.length; i++) { %>
-                            <li style="border-bottom: 1px solid lightgray">
-                                <a href="#">
-                                    <div>
-                                        <h4><%= session.user.incReq[i] %></h4>
-                                    </div>
-                                    <div>
-
-                                        <div style="width: 50%; display: inline;">
-                                            <input type="hidden" name="senderName" id="senderName"
-                                                value="<%= session.user.incReq[i] %>">
-                                            <button type="submit" id="accept_friend" class="btn btn-primary"
-                                                style="width: 8em">Accept</button>
-                                        </div>
-                                        <div style="width: 50%;  display: inline;">
-                                            <input type="hidden" name="user_Id" id="user_Id"
-                                                value="<%= session.user.incReq[i] %>">
-                                            <button type="submit" id="cancel_friend" class="btn btn-primary"
-                                                style="width: 8em">Cancel</button>
-                                        </div>
-                                    </div>
-                                </a>
-                            </li>
-                            <% } %>
-                            <% } else { %>
-                            <div>
-                                <h4 style="text-align:center">No requests</h4>
-                            </div>
-                            <% } %>
-                        </ul>
-                    </div>
-                </li>
-            </a>
             <a class="nav-item nav-pills mr-auto">
                 <input type="hidden" id="currentuser" value="<% session.user.username %>">
                 <a role="presentation"><a href="/search" style="margin-right: 15px; margin-top: 8px; margin-left: 15px">Search <i

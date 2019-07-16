@@ -16,13 +16,60 @@
             border: 1px solid #ccc;
             object-fit: contain;
         }
+        .usercard {
+            width: 190px;
+            height: 300px;
+            background-color: white;
+            border-radius: 5px;
+            box-shadow: 3px 3px 10px #A9A9A9;
+            padding: 20px;
+            margin: 20px;
+            overflow: visible;
+        }
+
+        .usercard-image {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            margin-left: 15%;
+            object-fit: contain;
+        }
+
+        .usercard-name {
+            margin-left: 10%;
+            margin-right: 10%
+        }
+
+        .usercard-username {
+            margin-left: 10%;
+            margin-right: 10%;
+            color: blue
+        }
+
+        .usercard-button {
+            width: 100px;
+            padding: 6px;
+            margin: 5px;
+            margin-left: 15%;
+            border-radius: 5px;
+            color: white;
+            border: none;
+        }
+
+        .accept {
+            background-color: green;
+        }
+
+        .reject {
+            background-color: red;
+        }
     </style>
 
-    <h4 class="page-header" style="text-align: center; margin-bottom: 15px; font-family: Arial, Helvetica, sans-serif">
+    <h5 class="page-header" style="text-align: center; margin-bottom: 15px; font-family: Arial, Helvetica, sans-serif">
         Welcome to your profile, <%= session.user.fname %> <span style="color: blue">(@<%= session.user.username %>).
         </span>
-        Feel free to upload a new profile picture, check your friend requests (above), or search for users (also above).
-    </h4>
+        Feel free to upload a new profile picture, check your friend requests (below), or search for users (above).
+    </h5>
     <div style="margin-left: 40%">
 
         <img class="profilestyle" src="/upload/<%= session.user.userImage %>" alt="<%= session.user.userImage %>">
@@ -44,10 +91,44 @@
 
     </div>
     <div style="text-align: center;">
+            <h3 style="background-color: whitesmoke; padding: 10px; border-radius: 5px; border: 1px solid lightgray">Friend Requests</h3>
+
+            <% if (session.user.incReq != null) { %>
+                <% for(var i = 0; i < session.user.incReq.length; i++) { %>
+                    <div class="usercard col-lg-3">
+                    <p class="usercard-username">@<%= session.user.incReq[i].sent %></p>
+                    <form method="POST" action="/addFriend">
+                      <div style="width: 50%; display: inline;">
+                        <input type="hidden" name="sender" id="sender" value="<%= session.user.incReq[i].sent %>">
+                        <button type="submit" class="accept"
+                          style="width: 8em">Accept</button>
+                      </div>
+                      </form>
+                      <form method="POST" action="/removeFriend">
+                      <div style="width: 50%;  display: inline;">
+                        <input type="hidden" name="sender" id="user_Id" value="<%= session.user.incReq[i].sent %>">
+                        <button type="submit" id="cancel_friend" class="reject"
+                          style="width: 8em">Cancel</button>
+                      </div>
+                      </form>
+                      </div>
+                  
+                <% } } %>
+
+    <div style="text-align: center;">
         <h3 style="background-color: whitesmoke; padding: 10px; border-radius: 5px; border: 1px solid lightgray">My
             Friends</h3>
+            <% if (session.user.friendsList != null) { %>
+                <% for(var i = 0; i < session.user.friendsList.length; i++) { %>
+                    <div class="usercard col-lg-3">
+                    <p class="usercard-username">username: @<%= session.user.friendsList[i].f1 %></p>
+                      
+                    </div>
+                  
+                <% } } %>
 
     </div>
+
     <style>
         body {
             padding-top: 1em;

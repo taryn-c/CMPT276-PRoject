@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <% include ../partials/head.ejs %>
+    <% include ../partials/styles/index.ejs %>
+
+</head>
+<script type="text/javascript">
+    function sentRequest(user) {
+        document.getElementById(user + "1").style.display = "none";
+        var sentRequest = document.createElement("p");
+        var message = document.createTextNode("Request sent!");
+        sentRequest.appendChild(message);
+
+        var element = document.getElementById(user);
+        element.appendChild(sentRequest);
+    }
+    function acceptRequest(user) {
+        document.getElementById(user + "a").style.display = "none";
+        document.getElementById(user + "c").style.display = "none";
+
+        var sentRequest = document.createElement("p");
+        var message = document.createTextNode("Friend added!");
+        sentRequest.appendChild(message);
+
+        var element = document.getElementById(user +"i");
+        element.appendChild(sentRequest);
+    }
+    function declineRequest(user) {
+        document.getElementById(user + "a").style.display = "none";
+        document.getElementById(user + "c").style.display = "none";
+
+        var sentRequest = document.createElement("p");
+        var message = document.createTextNode("Request canceled!");
+        sentRequest.appendChild(message);
+
+        var element = document.getElementById(user+ "i");
+        element.appendChild(sentRequest);
+    }
+</script>
+
+<body>
+    <% include ../partials/navprofile.ejs %>
+
+    <style>
+        .usercard {
+            width: 190px;
+            height: 300px;
+            background-color: white;
+            border-radius: 5px;
+            box-shadow: 3px 3px 10px #A9A9A9;
+            padding: 20px;
+            margin: 20px;
+            overflow: visible;
+        }
+
+        .usercard-image {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            margin-left: 15%;
+            object-fit: contain;
+        }
+
+        .usercard-name {
+            margin-left: 10%;
+            margin-right: 10%
+        }
+
+        .usercard-username {
+            margin-left: 10%;
+            margin-right: 10%;
+            color: blue
+        }
+
+        .usercard-button {
+            width: 100px;
+            padding: 6px;
+            margin: 5px;
+            margin-left: 15%;
+            border-radius: 5px;
+            color: white;
+            border: none;
+        }
+
+        .accept {
+            background-color: green;
+        }
+
+        .reject {
+            background-color: red;
+        }
+    </style>
+    <h2 style="text-align: center; font-family: Arial, Helvetica, sans-serif">All Users</h2>
+    <div style="text-align: center">
+        <form action="/searchuser" method="post">
+            <input type="text" name="searchfriend" placeholder="username">
+            <input type="submit" value="search" style="background-color: #3d4453ee; ">
+        </form>
+    </div>
+    <hr>
+    <% if (friend != null){ %>
+    <% for(var i =0; i < friend.length; i++) { %>
+    <div class="usercard col-lg-3" id=<%= friend[i].username %>>
+        <img class="usercard-image" src="upload/<%=friend[i].userimage %>">
+        <h4 class="usercard-name"><%= friend[i].firstname + " " + friend[i].lastname %></h4>
+        <p class="usercard-username">@<%= friend[i].username %></p>
+            <p>Your friend</p>
+    </div>
+    <% } } %>
+    <% if (incoming != null){ %>
+    <% for(var i =0; i < incoming.length; i++) { %>
+    <div class="usercard col-lg-3" id="<%= incoming[i].username %>i">
+            <iframe name="votar" style="display: none"></iframe>
+            <img class="usercard-image" src="upload/<%=incoming[i].userimage %>">
+        <h4 class="usercard-name"><%= incoming[i].firstname + " " + incoming[i].lastname %></h4>
+        <p class="usercard-username">@<%=incoming[i].username %></p>
+        <form method="POST" action="/addFriend" target="votar">
+            <div style="width: 50%; display: inline;">
+              <input type="hidden" name="senderadd" id="sender" value="<%= incoming[i].username %>">
+              <button type="submit" class="accept" id="<%= incoming[i].username %>a" onclick="acceptRequest('<%= incoming[i].username %>')"
+                style="width: 8em">Accept</button>
+            </div>
+        </form>
+        <form method="POST" action="/removeFriend" target="votar">
+            <div style="width: 50%;  display: inline;">
+              <input type="hidden" name="senderdecline" id="user_Id" value="<%= incoming[i].username %>">
+              <button type="submit" id="cancel_friend" class="reject" id="<%= incoming[i].username %>c" onclick="declineRequest('<%= incoming[i].username %>')"
+                style="width: 8em">Cancel</button>
+            </div>
+        </form>
+    </div>
+    <% } } %>
+
+    <% if (outgoing != null){ %>
+        <% for(var i =0; i < outgoing.length; i++) { %>
+        <div class="usercard col-lg-3" id=<%= outgoing[i].username %>>
+            <img class="usercard-image" src="upload/<%=outgoing[i].userimage %>">
+            <h4 class="usercard-name"><%= outgoing[i].firstname + " " + outgoing[i].lastname %></h4>
+            <p class="usercard-username">@<%= outgoing[i].username %></p>
+                <p>Request already sent!</p>
+        </div>
+        <% } } %>
+    <% if (result != null){ %>
+    <% for(var i =0; i < result.length; i++) { %>
+    <div class="usercard col-lg-3" id=<%= result[i].username %>>
+        <img class="usercard-image" src="upload/<%=result[i].userimage %>">
+        <h4 class="usercard-name"><%= result[i].firstname + " " + result[i].lastname %></h4>
+        <p class="usercard-username">@<%= result[i].username %></p>
+        <form action="" method="get" class="add_friend">
+            <input type="hidden" name="receiverName" class="receiverName" value="<%= result[i].username %>">
+            <input type="hidden" name="sender-name" id="sent1" class="sender-name" value="<%= session.user.username %>">
+            <button type="submit" id="<%= result[i].username%>1"
+                onclick="addFriend('<%= result[i].username%>'); sentRequest('<%= result[i].username%>') "
+                class="btn add accept friend-add"><i class="fa fa-user"></i> Add Friend</button>
+        </form>
+    </div>
+    <% } } %>
+    <% if (msg != '') { %>
+    <p><%= msg %></p>
+    <% } %>
+    </hr>
+
+</body>

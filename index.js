@@ -8,7 +8,7 @@ var assert= require('assert')
 var http = require('http').createServer(app);
 var io = require('socket.io')(http);
 var multer = require('multer');
-
+var async = require('async');
 
 
 const PORT = process.env.PORT || 8080
@@ -29,7 +29,7 @@ const ADMIN_LEVEL_SUPER_ADMIN = 2;
 // DATABASE SCHEMAS Version 1: 07-12
 /*
 users(username, password, firstname, lastname, email, height, weight, calorie
-	gender, activity_level, fit_goal, age, goalcount, userimage DEFAULT 'default.png')
+	gender, activity_level, fit_goal, age, goalcount, userimage DEFAULT 'default.png', totalrequest INT)
 
 user_progress(uid, cal_burn, time_spent, on_date, cal_cons, weight)
 
@@ -96,8 +96,8 @@ function createUser(data, callback) {
 
 	// To do: check for duplicate emails and usernames
 	// if (data.username == pool.query(select * from users where username == data.username))
-	pool.query("INSERT INTO public.users(username, password, firstname, lastname, email, age, weight, height, gender, activity_level, fit_goal, calorie, goalcount, userimage) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13);",
-		[data.username, data.password, data.firstname, data.lastname, data.email, data.age, data.weight, data.height, data.gender, data.activity_level, data.fit_goal, maintcal, goalcount, userImage], callback);
+	pool.query("INSERT INTO public.users(username, password, firstname, lastname, email, age, weight, height, gender, activity_level, fit_goal, calorie, goalcount, userimage, totalrequest) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15);",
+		[data.username, data.password, data.firstname, data.lastname, data.email, data.age, data.weight, data.height, data.gender, data.activity_level, data.fit_goal, maintcal, goalcount, userImage, 0], callback);
 
 
 }
@@ -210,7 +210,14 @@ app.get('/login', (req, res) => res.render('pages/login'))
 app.get('/register', (req, res) => res.render('pages/register'))
 app.get('/calories', loginRequired, (req, res) => res.render('pages/calories', {session:req.session}))
 app.get('/chat', loginRequired, (req, res) => res.render('pages/chat', {session:req.session}))
-app.get('/profile', loginRequired, (req, res) => res.render('pages/profile', {session:req.session}))
+app.get('/profile', loginRequired, function(req, res){
+	pool.query("select sent from request where rec=$1", [req.session.user.username], function(error, result){
+		if (error){
+			return callback(error);
+		}	
+		req.session.incReq = result.rows
+	})
+		res.render('pages/profile', {session:req.session})})
 
 // app.listen(PORT, () => console.log(`Listening on ${ PORT }`))
 
@@ -321,6 +328,7 @@ app.post("/api/login", function(req, res) {
 			username: data.username,
 			goalcount: data.goalcount,
 			userImage: data.userimage,
+			totalRequests: data.totalrequest,
 			goals: dailygoal,
 			friendsList: friends,
 			incReq: incoming,
@@ -589,7 +597,7 @@ function getUserGoals(data, callback){
 }
 function getFriendList(data, callback){
 
-	pool.query("select f2 from friendslist where f1=$1", [data.username], function(error, result){
+	pool.query("select f1 from friendslist where f2=$1", [data.username], function(error, result){
 		if (error){
 			return callback(error);
 		}
@@ -666,3 +674,332 @@ function checkFileType(file, cb){
 	  cb('Error: Images Only!');
 	}
   }
+
+
+app.get('/search', loginRequired, async (req, res) => {
+	try {
+
+		pool.query("select username, firstname, lastname, userimage from users inner join friendslist on $1=f1 where f2=username", [req.session.user.username], function (error, friends) {
+			if(error) console.log(error);
+			console.log(friends.rows);
+			if(friends.rows == 0){
+				friends.rows = null;
+			}
+		pool.query("select username, firstname, lastname, userimage from users inner join request on rec=$1 where sent=username", [req.session.user.username], function (error, incomings) {
+			if(error) console.log(error);
+			console.log(incomings.rows);
+			if(incomings.rows == 0){
+				incomings.rows = null;
+			}
+		pool.query("select username, firstname, lastname, userimage from users inner join request on sent=$1 where rec=username", [req.session.user.username], function (error, outgoings) {
+			if(error) console.log(error);
+			console.log(outgoings.rows);
+			if(outgoings.rows == 0){
+				outgoings.rows = null;
+			}
+		pool.query("select username, firstname, lastname, userimage from public.users where (username!=$1) AND username NOT IN (select sent from public.request where $1=rec UNION select f2 from public.friendslist where $1=f1 UNION select rec from public.request where $1=sent)", [req.session.user.username], function (error, results) {
+			if(error) console.log(error);
+			console.log(results.rows);
+			if(results.rows == 0){
+				results.rows = null;
+			}
+
+		console.log(results.rows);
+			res.render('pages/search', {
+				session: req.session,
+				result: results.rows,
+				friend: friends.rows,
+				incoming: incomings.rows,
+				outgoing: outgoings.rows,
+				msg: ''
+			});
+		});
+	});
+});
+});
+
+	} catch (err) {
+		console.error(err);
+		res.send("Error " + err);
+	}
+});
+
+function searchFriend(data, callback){
+	try {
+		pool.query("select username, firstname, lastname, userimage from users where username = $1 and username != $2;", [data.searchfriend,req.session.user.username], function(error, results){
+		  const result = { 'results': (results) ? results.rows : null};
+		  return result;
+		});
+  
+	  }catch (err) {
+		console.error(err);
+		res.send("Error " + err);
+	  }
+}
+
+function incrementRequest(data, callback){
+	try {
+		pool.query("update users set totalrequest = totalrequest + 1 where username = $1", [data.username], function(error){
+		if (error) console.log(error);
+		return;
+		});
+  
+	  }catch (err) {
+		console.error(err);
+		res.send("Error " + err);
+	  }
+}
+function decrementRequest(data, callback){
+	try {
+		pool.query("update users set totalrequest = totalrequest - 1 where username = $1", [data.username], function(error){
+		if (error) console.log(error);
+		return;
+		});
+  
+	  }catch (err) {
+		console.error(err);
+		res.send("Error " + err);
+	  }
+}
+
+function sendRequest(sender, reciever){
+	try {
+		pool.query("INSERT INTO request(sent,rec, message) VALUES($1,$2,$3);", [sender, reciever, ' '], function(error){
+		if (error) console.log(error);
+		return;
+		});
+  
+	  }catch (err) {
+		console.error(err);
+		res.send("Error " + err);
+	  }
+}
+
+function deleteRequest(sender, reciever){
+	try {
+		pool.query("DELETE FROM request(sent,rec) WHERE sent = $1 AND rec = $2", [sender, reciever], function(error){
+		if (error) console.log(error);
+		return;
+		});
+  
+	  }catch (err) {
+		console.error(err);
+		res.send("Error " + err);
+	  }
+}
+
+
+function addFriends(f1, f2){
+	try {
+		pool.query("INSERT INTO friendslist(f1,f2) VALUES($1,$2);", [f1,f2], function(error){
+		if (error) console.log(error);
+		});
+		pool.query("INSERT INTO friendslist(f1,f2) VALUES($1,$2);", [f2,f1], function(error){
+			if (error) console.log(error);
+			}
+		)
+  
+	  }catch (err) {
+		console.error(err);
+		res.send("Error " + err);
+	  }
+}
+app.post('/search', loginRequired, function (req, res) {
+	var searchfriend = req.body.searchfriend;
+	if (searchfriend) {
+		var mssg = '';
+		if (searchfriend == req.user.username) {
+			searchfriend = null;
+		}
+		searchFriend(searchfriend, function (err, result) {
+			if (err) throw err;
+			res.render('search', {
+				result: result,
+				mssg: mssg
+			});
+		});
+	}
+
+	async.parallel([
+		function (callback) {
+			if (req.body.receiverName) {
+				var flag = 0;
+				if (req.session.user.sentReq != null){
+				for(var i = 0; i < req.session.user.sentReq.length; i++){
+					if(req.body.receiverName == req.session.user.sentReq[i]){
+						flag = 1;
+						break;
+					}
+				}}
+				if (req.session.user.friendsList != null){
+				for(var i = 0; i < req.session.user.friendsList.length; i++){
+					if(req.body.receiverName == req.session.user.friendsList[i]){
+						flag = 1;
+						break;
+					}
+				}}
+				if (flag == 0){
+					incrementRequest(req.session.user);
+					sendRequest(req.session.user.username, req.body.receiverName);
+				}
+			
+				
+			}
+		}],
+		(err, results) => {
+			res.redirect('pages/search', {session:req.body.session});
+		});
+
+	async.parallel([
+		// this function is updated for the receiver of the friend request when it is accepted
+		function (callback) {
+			if (req.body.senderId) {
+				addFriends(req.body.senderId, req.session.user.username);
+				decrementRequest(req.session.user.username);
+			}
+		},
+		// this function is updated for the sender of the friend request when it is accepted by the receiver	
+		function (callback) {
+			if (req.body.senderId) {
+				deleteRequest(req.body.senderId, req.session.user.username);
+			}
+		}
+	], (err, results) => {
+		res.redirect('/search');
+	});
+});
+
+
+app.post('/addFriend', loginRequired, async(req,res) =>{
+	try {
+
+		await pool.query('INSERT INTO friendslist(f1, f2) VALUES($1,$2);',[req.session.user.username, req.body.senderadd],function(err){
+			if(err){
+				console.log(err);
+			}
+		
+		pool.query('INSERT INTO friendslist(f2, f1) VALUES($1,$2);',[req.session.user.username, req.body.senderadd],function(err){
+			if(err){
+				console.log(err);
+			}
+
+		pool.query('DELETE FROM request WHERE rec = $1 AND sent = $2;',[req.session.user.username, req.body.senderadd],function(err){
+			if(err){
+				console.log(err);
+			}
+
+		pool.query("select sent from request where rec=$1", [req.session.user.username], function(error, result){
+			if (error){
+				return callback(error);
+			}
+			req.session.user.incReq = result.rows;
+		pool.query("select f1 from friendslist where f2=$1", [req.session.user.username], function(error, result1){
+			if (error){
+				return callback(error);
+			}
+			req.session.user.friendsList = result1.rows;
+			res.render('pages/profile',{session:req.session} )
+		});
+	});
+});
+		});
+	});
+
+
+
+	}
+	catch(err){
+		console.log(err);
+		res.send("Error " + err);
+	}
+	return;
+});
+
+
+app.post('/removeFriend', loginRequired, function(req,res){
+
+	try {
+
+			pool.query('DELETE FROM request WHERE (rec = $1 AND sent = $2);',[req.session.user.username,req.body.sender],function(err){
+				if(err){
+					console.log(err);
+				}
+
+			pool.query("select sent from request where rec=$1", [req.session.user.username], function(error, result){
+				if (error){
+					console.log(err);
+				}
+				req.session.user.incReq = result.rows;
+				res.render('pages/profile', {session:req.session})
+			})
+		});
+		}
+		catch(err){
+			console.log(err);
+			res.send("Error " + err);
+		}
+
+});
+
+app.post('/searchuser', loginRequired, async (req, res)=> {
+    try {
+
+		var msg = '';
+		console.log(req.body.searchfriend);
+		console.log(req.session.user.username);
+		pool.query("select username, firstname, lastname, userimage from users inner join friendslist on f1=username where f1=$1 and f2=$2", [ req.body.searchfriend,req.session.user.username], function (error, friends) {
+			if(error) console.log(error);
+			console.log(friends.rows);
+			if(friends.rows == 0){
+				friends.rows = null;
+			}
+		pool.query("select username, firstname, lastname, userimage from users inner join request on sent=username where rec=$1 and sent=$2", [ req.session.user.username,req.body.searchfriend], function (error, incomings) {
+			if(error) console.log(error);
+			console.log(incomings.rows);
+			if(incomings.rows == 0){
+				incomings.rows = null;
+			}
+		pool.query("select username, firstname, lastname, userimage from public.users inner join public.request on username=rec where rec=$1 and sent=$2", [req.body.searchfriend,req.session.user.username,], function (error, outgoings) {
+			if(error) console.log(error);
+			console.log(outgoings.rows);
+			if(outgoings.rows == 0){
+				outgoings.rows = null;
+			}
+		if (friends.rows == null && incomings.rows == null && outgoings.rows == null){
+		pool.query("select username, firstname, lastname, userimage from public.users where username=$1", [req.body.searchfriend], function (error, results) {
+			if(error) console.log(error);
+			console.log(results.rows);
+			if(results.rows == 0){
+				results.rows = null;
+				var msg = "No username with that value exists"
+			}
+			res.render('pages/search', {
+				session: req.session,
+				result: results.rows,
+				friend: friends.rows,
+				incoming: incomings.rows,
+				outgoing: outgoings.rows,
+				msg: msg
+			});
+		})}
+		else{
+			res.render('pages/search', {
+				session: req.session,
+				result: null,
+				friend: friends.rows,
+				incoming: incomings.rows,
+				outgoing: outgoings.rows,
+				msg: "Your search results"
+			});
+		}
+
+		
+		});
+	});
+});
+
+    }catch (err) {
+      console.error(err);
+      res.send("Error " + err);
+    }
+});
