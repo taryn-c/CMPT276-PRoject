@@ -679,19 +679,19 @@ function checkFileType(file, cb){
 app.get('/search', loginRequired, async (req, res) => {
 	try {
 
-		pool.query("select username, firstname, lastname, userimage from users inner join friendslist on $1=f1 where f2=username", [req.session.user.username], function (error, friends) {
+		pool.query("select username, firstname, lastname, userimage from users inner join friendslist on username=f2 where f1=$1", [req.session.user.username], function (error, friends) {
 			if(error) console.log(error);
 			console.log(friends.rows);
 			if(friends.rows == 0){
 				friends.rows = null;
 			}
-		pool.query("select username, firstname, lastname, userimage from users inner join request on rec=$1 where sent=username", [req.session.user.username], function (error, incomings) {
+		pool.query("select username, firstname, lastname, userimage from users inner join request on rec=username where sent=$1", [req.session.user.username], function (error, incomings) {
 			if(error) console.log(error);
 			console.log(incomings.rows);
 			if(incomings.rows == 0){
 				incomings.rows = null;
 			}
-		pool.query("select username, firstname, lastname, userimage from users inner join request on sent=$1 where rec=username", [req.session.user.username], function (error, outgoings) {
+		pool.query("select username, firstname, lastname, userimage from users inner join request on sent=username where rec=$1", [req.session.user.username], function (error, outgoings) {
 			if(error) console.log(error);
 			console.log(outgoings.rows);
 			if(outgoings.rows == 0){
