@@ -20,9 +20,9 @@ const ADMIN_LEVEL_SUPER_ADMIN = 2;
 
 //Connect to Postgres database
 
-//  var pool = new Pool({
-//  connectionString: process.env.DATABASE_URL, ssl: true
-// });
+ var pool = new Pool({
+ connectionString: process.env.DATABASE_URL, ssl: true
+ });
 
 
 
@@ -43,12 +43,11 @@ dailygoal(username REFERENCES users:username, goalnum:int, goal:text)
 */
 
 
-var pool = new Pool({
- user: process.env.DB_USER || 'postgres',
+/* user: process.env.DB_USER || 'postgres',
  password: process.env.DB_PASS || 'root',
  host: process.env.DB_HOST || 'localhost',
  database: process.env.DB_DATABASE || 'postgres'
- });
+});*/
 
 
 // Creates a consistent hash for a username that shouldn't be able to be
@@ -98,7 +97,6 @@ function createUser(data, callback) {
 	// if (data.username == pool.query(select * from users where username == data.username))
 	pool.query("INSERT INTO public.users(username, password, firstname, lastname, email, age, weight, height, gender, activity_level, fit_goal, calorie, goalcount, userimage, totalrequest) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15);",
 		[data.username, data.password, data.firstname, data.lastname, data.email, data.age, data.weight, data.height, data.gender, data.activity_level, data.fit_goal, maintcal, goalcount, userImage, 0], callback);
-
 
 }
 
@@ -183,6 +181,7 @@ function loginRequired(req, res, next) {
   if (!req.session.user) {
     return res.render('pages/login')
   }
+  else assert(req.session.user);
 
   next();
 }
@@ -218,6 +217,8 @@ app.get('/profile', loginRequired, function(req, res){
 		req.session.incReq = result.rows
 	})
 		res.render('pages/profile', {session:req.session})})
+app.get('/workouts', loginRequired, (req, res) => res.render('pages/workouts', {session:req.session}))
+
 
 // app.listen(PORT, () => console.log(`Listening on ${ PORT }`))
 
@@ -378,6 +379,7 @@ app.get('/logout', function(req, res, next) {
       if(err) {
         return next(err);
       } else {
+        assert(!req.session);
         return res.redirect('/');
       }
     });
@@ -429,12 +431,18 @@ app.post('/edituser/:id', async (req, res) => {
     }
 });
 
-app.get('/deleteuser/:id', async (req, res) => {
+app.get('/delete-user/:id', async (req, res) => {
     try {
       const client = await pool.connect();
       await client.query('delete from users where username=$1',[req.params.id]);
-      res.redirect('pages/admin');
-      client.release();
+      await client.query('select * from users where username=$1',[req.params.id], function(error, result){
+        var count=result.rowCount;
+
+        assert(count==0);
+        res.redirect('/admin')
+        client.release();
+      });
+
     } catch (err) {
       console.error(err);
       res.send("Error " + err);
@@ -442,9 +450,8 @@ app.get('/deleteuser/:id', async (req, res) => {
 });
 
 
-
-
 //////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 app.post('/api/addGoal', loginRequired, function(req,res){
 	try {
 
@@ -612,7 +619,7 @@ function getFriendList(data, callback){
 }
 
 app.post('/change-picture', (req, res) => {
-	
+
 	upload(req, res, (err) => {
 		if (err) {
 			console.log(err);
@@ -625,12 +632,12 @@ app.post('/change-picture', (req, res) => {
 				});
 			}
 			else {
-				
+
 				pool.query("UPDATE users SET userimage = $1 WHERE username = $2;", [req.session.user.username + req.file.originalname, req.session.user.username], function (err) {
 					if (err) {
 						console.log(err);
 					}
-				
+
 				})
 				req.session.user.userImage = req.session.user.username + req.file.originalname;
 				res.render('pages/profile', {
@@ -667,7 +674,7 @@ function checkFileType(file, cb){
 	const extname = filetypes.test(path.extname(file.originalname).toLowerCase());
 	// Check mime
 	const mimetype = filetypes.test(file.mimetype);
-  
+
 	if(mimetype && extname){
 	  return cb(null,true);
 	} else {

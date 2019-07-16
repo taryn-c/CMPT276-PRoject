@@ -3,27 +3,20 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-    <a class="navbar-brand" href="/index">GitFit</a>
-    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup"
-        aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-    </button>
-    <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
-        <div class="navbar-nav" style="flex-grow: 1">
-            <a class="nav-item nav-link" href="/">Home <span class="sr-only">(current)</span></a>
-            <a class="nav-item nav-link" href="/calories">Today's Progress</a>
-            <a class="nav-item nav-link" href="/forum-home">Forum</a>
-            <a class="nav-item nav-link" href="/chat">Chat</a>
-            <a class="nav-item nav-link" href="/profile">Profile</a>
-            <div style="flex-grow: 1"></div>
-            <a class="nav-item nav-pills mr-auto">
-                <input type="hidden" id="currentuser" value="<% session.user.username %>">
-                <a role="presentation"><a href="/search" style="margin-right: 15px; margin-top: 8px; margin-left: 15px">Search <i
-                            class="fa fa-search"></i></a></a>
-            </a>
-
-            <a class="nav-item nav-link" href="/logout">Logout</a>
-        </div>
+  <a class="navbar-brand" href="/">GitFit</a>
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+  <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+    <div class="navbar-nav" style="flex-grow: 1">
+      <a class="nav-item nav-link" href="/">Home <span class="sr-only">(current)</span></a>
+      <a class="nav-item nav-link" href="/calories">Today's Progress</a>
+      <a class="nav-item nav-link" href="/workouts">Workout Plans</a>
+      <a class="nav-item nav-link" href="/forum-home">Forum</a>
+      <a class="nav-item nav-link" href="/chat">Chat</a>
+      <a class="nav-item nav-link" href="/profile">Profile</a>
+      <div style="flex-grow: 1"></div>
+      <a class="nav-item nav-link" href="/logout">Logout</a>
     </div>
 </nav>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>

@@ -76,7 +76,7 @@
 
 
         <form action="/change-picture" enctype="multipart/form-data" method="post" style="margin-top: 10px">
-            <input type="hidden" id = "changepic" name="uname" value="<%= session.user.username %>">       
+            <input type="hidden" id = "changepic" name="uname" value="<%= session.user.username %>">
             <label class="custombutton" id="custombutton"
                 style="width:200px;border: 1px solid rgb(136, 130, 130);display: inline-block; padding: 6px 12px;cursor: pointer;">
                 <input type="file" name="upload" accept="image/*" style=" display: none;"
