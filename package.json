@@ -15,12 +15,18 @@
     "chai-http": "^4.3.0",
     "cors": "^2.8.5",
     "ejs": "^2.5.6",
+<<<<<<< HEAD
     "express": "^4.17.1",
+=======
+    "express": "^4.15.2",
+    "express-fileupload": "^1.1.5",
+>>>>>>> d3656bfdf62b372176d20a203d357d386f96ae34
     "express-session": "^1.16.2",
     "formidable": "^1.2.1",
     "g": "^2.0.1",
     "heroku": "^7.26.2",
     "mocha": "^6.1.4",
+    "multer": "^1.4.1",
     "pg": "^7.11.0",
     "socket.io": "^2.2.0"
   },
