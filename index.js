@@ -106,16 +106,17 @@ Add calorie progress for user on each day
 */
 
 function addProgress(data, callback) {
-  if (data.caloriesConsumed == null) return callback('addProgress missing caloriesConsumed');
-	if (data.caloriesBurned == null) return callback('addProgress missing caloriesBurned');
+  if (data.caloriesConsumed == null) data.caloriesConsumed = -1;
+	if (data.activityMET == null) return callback('addProgress missing activityMET');
 	if (data.timeExercised == null) return callback('addProgress missing timeExercised');
 	if (data.onDate == null) return callback('addProgress missing onDate');
   if (data.currentWeight == null) return callback('addProgress missing currentWeight');
 	if (data.username == null) return callback('addProgress missing username');
 
-  // To do: add cookie to track current user's username, so no re-entry required
+  var burned = Math.round(data.timeExercised * 0.0175 * data.activityMET * (data.currentWeight/2.20462));
+
 	pool.query("INSERT INTO public.user_progress (uid, cal_burn, time_spent, on_date, cal_cons, weight) VALUES ($1, $2, $3, $4, $5, $6);",
-		[data.username, data.caloriesBurned, data.timeExercised, data.onDate, data.caloriesConsumed, data.currentWeight], callback);
+		[data.username, burned, data.timeExercised, data.onDate, data.caloriesConsumed, data.currentWeight], callback);
 }
 
 function loginUser(data, callback) {
@@ -213,7 +214,7 @@ app.get('/profile', loginRequired, function(req, res){
 	pool.query("select sent from request where rec=$1", [req.session.user.username], function(error, result){
 		if (error){
 			return callback(error);
-		}	
+		}
 		req.session.incReq = result.rows
 	})
 		res.render('pages/profile', {session:req.session})})
@@ -737,7 +738,7 @@ function searchFriend(data, callback){
 		  const result = { 'results': (results) ? results.rows : null};
 		  return result;
 		});
-  
+
 	  }catch (err) {
 		console.error(err);
 		res.send("Error " + err);
@@ -750,7 +751,7 @@ function incrementRequest(data, callback){
 		if (error) console.log(error);
 		return;
 		});
-  
+
 	  }catch (err) {
 		console.error(err);
 		res.send("Error " + err);
@@ -762,7 +763,7 @@ function decrementRequest(data, callback){
 		if (error) console.log(error);
 		return;
 		});
-  
+
 	  }catch (err) {
 		console.error(err);
 		res.send("Error " + err);
@@ -775,7 +776,7 @@ function sendRequest(sender, reciever){
 		if (error) console.log(error);
 		return;
 		});
-  
+
 	  }catch (err) {
 		console.error(err);
 		res.send("Error " + err);
@@ -788,7 +789,7 @@ function deleteRequest(sender, reciever){
 		if (error) console.log(error);
 		return;
 		});
-  
+
 	  }catch (err) {
 		console.error(err);
 		res.send("Error " + err);
@@ -805,7 +806,7 @@ function addFriends(f1, f2){
 			if (error) console.log(error);
 			}
 		)
-  
+
 	  }catch (err) {
 		console.error(err);
 		res.send("Error " + err);
@@ -849,8 +850,8 @@ app.post('/search', loginRequired, function (req, res) {
 					incrementRequest(req.session.user);
 					sendRequest(req.session.user.username, req.body.receiverName);
 				}
-			
-				
+
+
 			}
 		}],
 		(err, results) => {
@@ -865,7 +866,7 @@ app.post('/search', loginRequired, function (req, res) {
 				decrementRequest(req.session.user.username);
 			}
 		},
-		// this function is updated for the sender of the friend request when it is accepted by the receiver	
+		// this function is updated for the sender of the friend request when it is accepted by the receiver
 		function (callback) {
 			if (req.body.senderId) {
 				deleteRequest(req.body.senderId, req.session.user.username);
@@ -884,7 +885,7 @@ app.post('/addFriend', loginRequired, async(req,res) =>{
 			if(err){
 				console.log(err);
 			}
-		
+
 		pool.query('INSERT INTO friendslist(f2, f1) VALUES($1,$2);',[req.session.user.username, req.body.senderadd],function(err){
 			if(err){
 				console.log(err);
@@ -1000,7 +1001,7 @@ app.post('/searchuser', loginRequired, async (req, res)=> {
 			});
 		}
 
-		
+
 		});
 	});
 });
