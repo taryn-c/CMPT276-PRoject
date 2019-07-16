@@ -7,6 +7,9 @@ var cors = require('cors')
 var assert= require('assert')
 var http = require('http').createServer(app);
 var io = require('socket.io')(http);
+var multer = require('multer');
+
+
 
 const PORT = process.env.PORT || 8080
 const Pool = require('pg').Pool;
@@ -17,16 +20,16 @@ const ADMIN_LEVEL_SUPER_ADMIN = 2;
 
 //Connect to Postgres database
 
- var pool = new Pool({
- connectionString: process.env.DATABASE_URL, ssl: true
-});
+//  var pool = new Pool({
+//  connectionString: process.env.DATABASE_URL, ssl: true
+// });
 
 
 
 // DATABASE SCHEMAS Version 1: 07-12
 /*
 users(username, password, firstname, lastname, email, height, weight, calorie
-	gender, activity_level, fit_goal, age, goalcount, userImage)
+	gender, activity_level, fit_goal, age, goalcount, userimage DEFAULT 'default.png')
 
 user_progress(uid, cal_burn, time_spent, on_date, cal_cons, weight)
 
@@ -40,12 +43,13 @@ dailygoal(username REFERENCES users:username, goalnum:int, goal:text)
 */
 
 
-// var pool = new Pool({
-//  user: process.env.DB_USER || 'postgres',
-//  password: process.env.DB_PASS || 'root',
-//  host: process.env.DB_HOST || 'localhost',
-//  database: process.env.DB_DATABASE || 'postgres'
-//  });
+var pool = new Pool({
+ user: process.env.DB_USER || 'postgres',
+ password: process.env.DB_PASS || 'root',
+ host: process.env.DB_HOST || 'localhost',
+ database: process.env.DB_DATABASE || 'postgres'
+ });
+
 
 // Creates a consistent hash for a username that shouldn't be able to be
 // converted back into the original username within the next 1000 years.
@@ -75,11 +79,13 @@ function createUser(data, callback) {
 		var calorie = (10.0 * (2.220 * data.weight) + (6.25 * data.height) - (5*data.age) + 5)
 		calorie = (calorie*data.activity_level)
 		calorie = calorie + data.fit_goal;
+		var userImage = 'default_m.png';
 		}
 	else if (data.gender == 'female'){
 		var calorie = (10* (2.220 * data.weight) + (6.25 * data.height) - (5*data.age) - 161)
 		calorie = (calorie*data.activity_level)
 		calorie = calorie + data.fit_goal;
+		var userImage = 'default_f.png';
 		}
 
 
@@ -90,8 +96,8 @@ function createUser(data, callback) {
 
 	// To do: check for duplicate emails and usernames
 	// if (data.username == pool.query(select * from users where username == data.username))
-	pool.query("INSERT INTO public.users(username, password, firstname, lastname, email, age, weight, height, gender, activity_level, fit_goal, calorie, goalcount) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13);",
-		[data.username, data.password, data.firstname, data.lastname, data.email, data.age, data.weight, data.height, data.gender, data.activity_level, data.fit_goal, maintcal, goalcount], callback);
+	pool.query("INSERT INTO public.users(username, password, firstname, lastname, email, age, weight, height, gender, activity_level, fit_goal, calorie, goalcount, userimage) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13);",
+		[data.username, data.password, data.firstname, data.lastname, data.email, data.age, data.weight, data.height, data.gender, data.activity_level, data.fit_goal, maintcal, goalcount, userImage], callback);
 
 
 }
@@ -292,7 +298,13 @@ app.post("/api/login", function(req, res) {
 			console.error(error);
 			return;
 		}
-	getFriendRequest(req.body, function(error, requests){
+	getFriendRequest(req.body, function(error, incoming){
+		if(error){
+			res.status(400);
+			console.error(error);
+			return;
+			}
+	getOutgoingRequests(req.body, function(error, outgoing){
 		if(error){
 			res.status(400);
 			console.error(error);
@@ -308,10 +320,11 @@ app.post("/api/login", function(req, res) {
 			calorie: data.calorie,
 			username: data.username,
 			goalcount: data.goalcount,
-			userImage: data.userImage,
+			userImage: data.userimage,
 			goals: dailygoal,
 			friendsList: friends,
-			friendReq: requests
+			incReq: incoming,
+			sentReq: outgoing
 
 		}
 
@@ -329,6 +342,7 @@ app.post("/api/login", function(req, res) {
 				res.redirect('/');
 			}
 		}
+	});
 	});
 	});
 	});
@@ -540,6 +554,22 @@ function getFriendRequest(data, callback){
 	}
 	});
 }
+function getOutgoingRequests(data, callback){
+
+	pool.query("select rec from request where sent=$1", [data.username], function(error, result){
+		if (error){
+			return callback(error);
+		}
+
+	if(result.rowCount > 0){
+		callback(null, result.rows);
+	}
+	else{
+		callback(null,null);
+	}
+	});
+}
+
 
 
 function getUserGoals(data, callback){
@@ -572,4 +602,67 @@ function getFriendList(data, callback){
 	}
 	});
 }
+
+app.post('/change-picture', (req, res) => {
+	
+	upload(req, res, (err) => {
+		if (err) {
+			console.log(err);
+			res.render('pages/index.ejs', { session: req.session });
+		}
+		else {
+			if (req.file == undefined) {
+				res.redirect('pages/profile', {
+					msg: 'Error: No File Selected!'
+				});
+			}
+			else {
+				
+				pool.query("UPDATE users SET userimage = $1 WHERE username = $2;", [req.session.user.username + req.file.originalname, req.session.user.username], function (err) {
+					if (err) {
+						console.log(err);
+					}
+				
+				})
+				req.session.user.userImage = req.session.user.username + req.file.originalname;
+				res.render('pages/profile', {
+					session:req.session,
+					msg: 'Photo uploaded succesfully!' })
+			};
+		}
+	});
+
+});
 module.exports = app;
+
+// Set The Storage Engine
+const storage = multer.diskStorage({
+	destination: './public/upload/',
+	filename: function(req, file, cb){
+	  cb(null,req.session.user.username+file.originalname);
+	}
+  });
+
+const upload = multer({
+	storage: storage,
+	limits: { fileSize: 1000000 },
+	fileFilter: function (req, file, cb) {
+		checkFileType(file, cb);
+	}
+}).single('upload');
+
+// Check File Type
+function checkFileType(file, cb){
+	// Allowed ext
+	const filetypes = /jpeg|jpg|png|gif/;
+	// Check ext
+	const extname = filetypes.test(path.extname(file.originalname).toLowerCase());
+	// Check mime
+	const mimetype = filetypes.test(file.mimetype);
+  
+	if(mimetype && extname){
+	  return cb(null,true);
+	} else {
+	  cb('Error: Images Only!');
+	}
+  }
