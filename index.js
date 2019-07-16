@@ -211,6 +211,7 @@ app.get('/register', (req, res) => res.render('pages/register'))
 app.get('/calories', loginRequired, (req, res) => res.render('pages/calories', {session:req.session}))
 app.get('/chat', loginRequired, (req, res) => res.render('pages/chat', {session:req.session}))
 app.get('/profile', loginRequired, (req, res) => res.render('pages/profile', {session:req.session}))
+app.get('/workouts', loginRequired, (req, res) => res.render('pages/workouts', {session:req.session}))
 
 // app.listen(PORT, () => console.log(`Listening on ${ PORT }`))
 
