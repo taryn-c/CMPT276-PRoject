@@ -20,9 +20,9 @@ const ADMIN_LEVEL_SUPER_ADMIN = 2;
 
 //Connect to Postgres database
 
-//  var pool = new Pool({
-//  connectionString: process.env.DATABASE_URL, ssl: true
-// });
+ var pool = new Pool({
+ connectionString: process.env.DATABASE_URL, ssl: true
+});
 
 
 
@@ -43,12 +43,12 @@ dailygoal(username REFERENCES users:username, goalnum:int, goal:text)
 */
 
 
-var pool = new Pool({
- user: process.env.DB_USER || 'postgres',
- password: process.env.DB_PASS || 'root',
- host: process.env.DB_HOST || 'localhost',
- database: process.env.DB_DATABASE || 'postgres'
- });
+// var pool = new Pool({
+//  user: process.env.DB_USER || 'postgres',
+//  password: process.env.DB_PASS || 'root',
+//  host: process.env.DB_HOST || 'localhost',
+//  database: process.env.DB_DATABASE || 'postgres'
+//  });
 
 
 // Creates a consistent hash for a username that shouldn't be able to be
@@ -109,15 +109,15 @@ Add calorie progress for user on each day
 
 function addProgress(data, callback) {
   if (data.caloriesConsumed == null) return callback('addProgress missing caloriesConsumed');
-	if (data.caloriesBurned == null) return callback('addProgress missing caloriesBurned');
+	if (data.activityMET == null) return callback('addProgress missing activityMET');
 	if (data.timeExercised == null) return callback('addProgress missing timeExercised');
 	if (data.onDate == null) return callback('addProgress missing onDate');
   if (data.currentWeight == null) return callback('addProgress missing currentWeight');
 	if (data.username == null) return callback('addProgress missing username');
 
-  // To do: add cookie to track current user's username, so no re-entry required
+  var burned = Math.round(data.timeExercised * 0.0175 * data.activityMET * (data.currentWeight/2.2046));
 	pool.query("INSERT INTO public.user_progress (uid, cal_burn, time_spent, on_date, cal_cons, weight) VALUES ($1, $2, $3, $4, $5, $6);",
-		[data.username, data.caloriesBurned, data.timeExercised, data.onDate, data.caloriesConsumed, data.currentWeight], callback);
+		[data.username, burned, data.timeExercised, data.onDate, data.caloriesConsumed, data.currentWeight], callback);
 }
 
 function loginUser(data, callback) {
@@ -604,7 +604,7 @@ function getFriendList(data, callback){
 }
 
 app.post('/change-picture', (req, res) => {
-	
+
 	upload(req, res, (err) => {
 		if (err) {
 			console.log(err);
@@ -617,12 +617,12 @@ app.post('/change-picture', (req, res) => {
 				});
 			}
 			else {
-				
+
 				pool.query("UPDATE users SET userimage = $1 WHERE username = $2;", [req.session.user.username + req.file.originalname, req.session.user.username], function (err) {
 					if (err) {
 						console.log(err);
 					}
-				
+
 				})
 				req.session.user.userImage = req.session.user.username + req.file.originalname;
 				res.render('pages/profile', {
@@ -659,7 +659,7 @@ function checkFileType(file, cb){
 	const extname = filetypes.test(path.extname(file.originalname).toLowerCase());
 	// Check mime
 	const mimetype = filetypes.test(file.mimetype);
-  
+
 	if(mimetype && extname){
 	  return cb(null,true);
 	} else {

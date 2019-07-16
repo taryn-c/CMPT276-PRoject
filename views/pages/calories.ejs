@@ -14,13 +14,37 @@
           <form action="/api/calories" method="POST">
               <h2 class="text-center">Input Workout Info</h2>
               <div class="form-group">
-                <input type="number" class="form-control" name="caloriesConsumed" placeholder="Calories-consumed" required>
+                <input type="number" class="form-control" name="caloriesConsumed" placeholder="Calories-consumed (not used in calories bured calculation)" required>
+              </div>
+              <div class ="col-md-4">
+                  <p>Physical Activity:</p>
+              <select name = "activityMET">
+                  <option value=8.5>bicycling, mountain, general</option>
+                  <option value=3.5>bicycling, leisure, 5.5 mph</option>
+                  <option value =5.8>bicycling, leisure, 9.4 mph</option>
+                  <option value =5.0>unicycling</option>
+                  <option value =7.0>bicycling, stationary, general</option>
+                  <option value =3.5>bicycling, stationary, 30-50 watts, very light to light effort</option>
+                  <option value =4.8>bicycling, stationary, 51-89 watts, light-to-moderate effort</option>
+                  <option value =6.8>bicycling, stationary, 90-100 watts, moderate to vigorous effort</option>
+                  <option value =8.8>bicycling, stationary, 101-160 watts, vigorous effort</option>
+                  <option value =11.0>bicycling, stationary, 161-200 watts, vigorous effort</option>
+                  <option value =14.0>bicycling, stationary, 201-270 watts, very vigorous effort</option>
+                  <option value =8.0>calisthenics (e.g., push ups, sit ups, pull-ups, jumping jacks), vigorous effort</option>
+                  <option value =3.8>calisthenics (e.g., push ups, sit ups, pull-ups, lunges), moderate effort</option>
+                  <option value =2.8>calisthenics (e.g., situps, abdominal crunches), light effort</option>
+                  <option value =3.5>calisthenics, light or moderate effort, general (e.g., back exercises), going up & down from floor</option>
+                  <option value =7.0>jogging, general</option>
+                  <option value =13.3>running, marathon</option>
+                  <option value =9.8>running, 6 mph (10 min/mile)</option>
+                  <option value =11.8>running, 8 mph (7.5 min/mile)</option>
+                  <option value =14.5>running, 10 mph (6 min/mile)</option>
+                  <option value =19.0>running, 12 mph (5 min/mile)</option>
+
+              </select>
               </div>
               <div class="form-group">
-                <input type="number" class="form-control" name="caloriesBurned" placeholder="Calories-burned" required>
-              </div>
-              <div class="form-group">
-                <input type="number" class="form-control" name="timeExercised" placeholder="Time-exercised (min)" required>
+                <input type="number" class="form-control" name="timeExercised" placeholder="Activity Duration (min)" required>
               </div>
               <div class="form-group">
                 Date taken place:
