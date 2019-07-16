@@ -17,7 +17,7 @@ const Pool = require('pg').Pool;
 const ADMIN_LEVEL_NOT_ADMIN = 0;
 const ADMIN_LEVEL_REGULAR_ADMIN = 1;
 const ADMIN_LEVEL_SUPER_ADMIN = 2;
-/*
+
 //Connect to Postgres database
 
  var pool = new Pool({
