@@ -428,8 +428,8 @@ app.get('/delete-user/:id', async (req, res) => {
       await client.query('delete from users where username=$1',[req.params.id]);
       await client.query('select * from users where username=$1',[req.params.id], function(error, result){
         var count=result.rowCount;
-        console.log(count);
-        //assert(count==0);
+
+        assert(count==0);
         res.redirect('/admin')
         client.release();
       });
