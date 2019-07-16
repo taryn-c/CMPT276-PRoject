@@ -16,7 +16,7 @@
               <div class="form-group">
                 <input type="number" class="form-control" name="caloriesConsumed" placeholder="Calories-consumed (not used in calories bured calculation)" required>
               </div>
-              <div class ="col-md-4">
+              <div class ="col-md-auto">
                   <p>Physical Activity:</p>
               <select name = "activityMET">
                   <option value=8.5>bicycling, mountain, general</option>
@@ -37,17 +37,37 @@
                   <option value =7.0>jogging, general</option>
                   <option value =13.3>running, marathon</option>
                   <option value =9.8>running, 6 mph (10 min/mile)</option>
+                  <option value =11.0>running, 7 mph (8.5 min/mile)</option>
                   <option value =11.8>running, 8 mph (7.5 min/mile)</option>
+                  <option value =12.8>running, 9 mph (6.5 min/mile)</option>
                   <option value =14.5>running, 10 mph (6 min/mile)</option>
+                  <option value =16.0>running, 11 mph (5.5 min/mile)</option>
                   <option value =19.0>running, 12 mph (5 min/mile)</option>
-
+                  <option value =9.0>running, cross country</option>
+                  <option value =5.5>badminton, social singles and doubles, general</option>
+                  <option value =6.5>basketball, general</option>
+                  <option value =9.3>basketball, drills, practice</option>
+                  <option value =3.8>bowling, indoor, bowling alley</option>
+                  <option value =12.8>boxing, in ring, general</option>
+                  <option value =8.0>football, touch, flag, general</option>
+                  <option value =8.0>frisbee, ultimate</option>
+                  <option value =4.8>golf, general</option>
+                  <option value =3.8>gymnastics, general</option>
+                  <option value =7.8>hockey, field</option>
+                  <option value =8.0>hockey, ice, general</option>
+                  <option value =10.0>hockey, ice, competitive</option>
+                  <option value =10.0>soccer, competitive</option>
+                  <option value =7.0>soccer, casual, general</option>
+                  <option value =7.3>squash, general</option>
+                  <option value =8.0>tennis, singles</option>
               </select>
               </div>
+              <br>
               <div class="form-group">
                 <input type="number" class="form-control" name="timeExercised" placeholder="Activity Duration (min)" required>
               </div>
               <div class="form-group">
-                Date taken place:
+                  <p>Date taken place:</p>
                 <input type="date" class="form-control" name="onDate" required>
               </div>
               <div class="form-group">
@@ -55,7 +75,7 @@
                 <input <input type="hidden" name="username" value="<%= session.user.username%>">
               </div>
               <div class="form-group">
-              <button type="submit" class="btn btn-primary btn-block">Add to record</button>
+              <button type="submit" class="btn btn-primary">Add to record</button>
               </div>
           </form>
 
