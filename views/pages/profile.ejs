@@ -7,30 +7,41 @@
 </head>
 
 <body>
-<style>
-.profilestyle {
-    width: 250px;
-    height: 250px;
-    border-radius: 50%;
-    border:1px solid #ccc;
-    object-fit: contain;
-    }    
-</style>
+    <% include ../partials/navprofile.ejs %>
+    <style>
+        .profilestyle {
+            width: 250px;
+            height: 250px;
+            border-radius: 50%;
+            border: 1px solid #ccc;
+            object-fit: contain;
+        }
+    </style>
 
-    <h2 class="page-header"><%= session.user.fname %> <span style="color: blue">(@<%= session.user.username %>)</span>
-    </h2>
-    <div style="margin-left: 50%">
+    <h4 class="page-header" style="text-align: center; margin-bottom: 15px; font-family: Arial, Helvetica, sans-serif">
+        Welcome to your profile, <%= session.user.fname %> <span style="color: blue">(@<%= session.user.username %>).
+        </span>
+        Feel free to upload a new profile picture, check your friend requests (above), or search for users (also above).
+    </h4>
+    <div style="margin-left: 40%">
+
         <img class="profilestyle" src="/upload/<%= session.user.userImage %>" alt="<%= session.user.userImage %>">
-        <form action="/" enctype="multipart/form-data" method="post" style="margin-top: 10px">
+
+
+        <form action="/change-picture" enctype="multipart/form-data" method="post" style="margin-top: 10px">
+            <input type="hidden" id = "changepic" name="uname" value="<%= session.user.username %>">       
             <label class="custombutton" id="custombutton"
-                style="width:200px;border: 1px solid #ccc;display: inline-block; padding: 6px 12px;cursor: pointer;">
+                style="width:200px;border: 1px solid rgb(136, 130, 130);display: inline-block; padding: 6px 12px;cursor: pointer;">
                 <input type="file" name="upload" accept="image/*" style=" display: none;"
                     onchange="document.getElementById('custombutton').style.border = '2px solid lightgreen'">
                 Select new file
             </label>
             <input type="submit" value="Upload"
-                style="border: 1px solid #2d2d2d ; padding: 6px 12px; cursor: pointer; background-color: #2d2d2d; color: #ccc">
+                style="border: 1px solid #413f3f ; padding: 6px 12px; cursor: pointer; background-color: #413f3f; color: #ccc">
         </form>
+    </div>
+    <p style="font-family: Arial, Helvetica, sans-serif; color: darkolivegreen; text-align: center"><%= typeof msg != 'undefined' ? msg : '' %></p>
+
     </div>
     <div style="text-align: center;">
         <h3 style="background-color: whitesmoke; padding: 10px; border-radius: 5px; border: 1px solid lightgray">My
@@ -38,37 +49,37 @@
 
     </div>
     <style>
-            body {
+        body {
             padding-top: 1em;
-            }	
-            </style> <div class="container-fluid">
-                
-            <div class="progress">
-            <div class="progress-bar" role="progressbar" style="width: 75%" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100"></div>
-            </div>
-            
-            </div>
-                
-            <!-- jQuery library -->
-            <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
-            
-            <!-- Popper -->
-            <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
-            
-            <!-- Latest compiled and minified Bootstrap JavaScript -->
-            <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
-            
-            <!-- Initialize Bootstrap functionality -->
-            <script>
-            // Initialize tooltip component
-            $(function () {
-              $('[data-toggle="tooltip"]').tooltip()
-            })
-            
-            // Initialize popover component
-            $(function () {
-              $('[data-toggle="popover"]').popover()
-            })
-            </script>
-            
+        }
+    </style>
+
+    <!-- jQuery library -->
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
+        integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
+        crossorigin="anonymous"></script>
+
+    <!-- Popper -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
+        integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+        crossorigin="anonymous"></script>
+
+    <!-- Latest compiled and minified Bootstrap JavaScript -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
+        integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+        crossorigin="anonymous"></script>
+
+    <!-- Initialize Bootstrap functionality -->
+    <script>
+        // Initialize tooltip component
+        $(function () {
+            $('[data-toggle="tooltip"]').tooltip()
+        })
+
+        // Initialize popover component
+        $(function () {
+            $('[data-toggle="popover"]').popover()
+        })
+    </script>
+
 </body>
