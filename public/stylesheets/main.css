@@ -31,3 +31,9 @@ body, html {
   background-position: center;
   background-size: cover;
 }
+
+.register{
+  background-image: url("../images/register.jpg");
+  background-size: cover;
+  background-repeat: no-repeat;
+}

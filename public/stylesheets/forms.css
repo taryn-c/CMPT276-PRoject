@@ -13,21 +13,23 @@
 
 
 .signup-form{
-        width: 400px;
+        width: 520px;
         margin: 0 auto;
         padding: 30px 0;
+        opacity: .9;
       }
-.signup-form h2{
+.signup-form h4{
         color: black;
         margin: 0 0 15px;
         position: relative;
         text-align: center;
+        font-family: Verdana;
         }
 
-.signup-form h2:before{
+.signup-form h4:before{
         left: 0;
       }
-.signup-form h2:after{
+.signup-form h4:after{
         right: 0;
       }
 .signup-form form{
@@ -87,6 +89,7 @@
      }
 .login-form h2 {
       margin: 0 0 15px;
+      font-family: Verdana;
      }
 .form-control, .btn {
       min-height: 38px;
