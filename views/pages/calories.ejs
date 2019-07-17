@@ -11,7 +11,7 @@
   <% include ../partials/navuser.ejs %>
   <main>
       <div class="calories-form">
-          <form action="/api/calories" method="POST">
+          <form id="newActivity"action="/api/calories" method="POST">
               <h2 class="text-center">Input Workout Info</h2>
               <div class="form-group">
                 <input type="number" class="form-control" name="caloriesConsumed" placeholder="Calories-consumed (just for record)" required>
@@ -67,6 +67,11 @@
                   <option value =4.0>yoga, Power</option>
                   <option value =2.0>yoga, Nadisodhana</option>
                   <option value =3.3>yoga, Surya Namaskar</option>
+                  <option value =3.5>walking, 3.0 mph, moderate speed, not carrying anything</option>
+                  <option value =4.3>walking, 3.5 mph, brisk speed, not carrying anything</option>
+                  <option value =3.5>walking, 2.5 mph slowly and carrying objects less than 25 lbs</option>
+                  <option value =4.5>walking, 3.0 mph moderately and carrying objects less than 25 lbs, pushing something</option>
+                  <option value =4.8>walking, 3.5 mph, briskly and carrying objects less than 25 lbs</option>
               </select>
               </div>
               <br>
@@ -85,9 +90,21 @@
               <button type="submit" class="btn btn-primary">Add to record</button>
               </div>
           </form>
-
+          <p id="calBurned"></p>
       </div>
-  
+  <script>
+
+    var activityform = document.getElementById("newActivity");
+    activityform.addEventListener("input", function () {
+        var TimeMin = document.getElementById("newActivity").timeExercised.value;
+        var curWeight = document.getElementById("newActivity").currentWeight.value;
+        var actMET = document.getElementById("newActivity").activityMET.value;
+        var burned = Math.round(TimeMin * 0.0175 * actMET * (curWeight/2.20462));
+        document.getElementById("calBurned").innerHTML = "From the latest entry, you have burned " + burned + " calories.";
+    });
+    
+
+  </script>
   </main>
 
   </body>
