@@ -771,7 +771,7 @@ function decrementRequest(data, callback){
 
 function sendRequest(sender, reciever){
 	try {
-		pool.query("INSERT INTO request(sent,rec, message) VALUES($1,$2,$3);", [sender, reciever, ' '], function(error){
+		pool.query("INSERT INTO request(sent,rec) VALUES($1,$2);", [sender, reciever], function(error){
 		if (error) console.log(error);
 		return;
 		});
@@ -811,6 +811,8 @@ function addFriends(f1, f2){
 		res.send("Error " + err);
 	  }
 }
+
+
 app.post('/search', loginRequired, function (req, res) {
 	var searchfriend = req.body.searchfriend;
 	if (searchfriend) {
