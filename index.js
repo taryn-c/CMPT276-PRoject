@@ -693,19 +693,19 @@ app.get('/search', loginRequired, async (req, res) => {
 			if(friends.rows == 0){
 				friends.rows = null;
 			}
-		pool.query("select username, firstname, lastname, userimage from users inner join request on rec=username where sent=$1", [req.session.user.username], function (error, incomings) {
+		pool.query("select username, firstname, lastname, userimage from users inner join request on sent=username where rec=$1", [req.session.user.username], function (error, incomings) {
 			if(error) console.log(error);
 			console.log(incomings.rows);
 			if(incomings.rows == 0){
 				incomings.rows = null;
 			}
-		pool.query("select username, firstname, lastname, userimage from users inner join request on sent=username where rec=$1", [req.session.user.username], function (error, outgoings) {
+		pool.query("select username, firstname, lastname, userimage from users inner join request on rec=username where sent=$1", [req.session.user.username], function (error, outgoings) {
 			if(error) console.log(error);
 			console.log(outgoings.rows);
 			if(outgoings.rows == 0){
 				outgoings.rows = null;
 			}
-		pool.query("select username, firstname, lastname, userimage from public.users where (username!=$1) AND username NOT IN (select sent from public.request where $1=rec UNION select f2 from public.friendslist where $1=f1 UNION select rec from public.request where $1=sent)", [req.session.user.username], function (error, results) {
+		pool.query("select username, firstname, lastname, userimage from users where (username!=$1) AND username NOT IN (select sent from request where $1=rec UNION select f2 from friendslist where $1=f1 UNION select rec from request where $1=sent)", [req.session.user.username], function (error, results) {
 			if(error) console.log(error);
 			console.log(results.rows);
 			if(results.rows == 0){
@@ -930,7 +930,7 @@ app.post('/removeFriend', loginRequired, function(req,res){
 
 	try {
 
-			pool.query('DELETE FROM request WHERE (rec = $1 AND sent = $2);',[req.session.user.username,req.body.sender],function(err){
+			pool.query('DELETE FROM request WHERE (rec = $1 AND sent = $2);',[req.session.user.username,req.body.senderdecline],function(err){
 				if(err){
 					console.log(err);
 				}
@@ -969,14 +969,14 @@ app.post('/searchuser', loginRequired, async (req, res)=> {
 			if(incomings.rows == 0){
 				incomings.rows = null;
 			}
-		pool.query("select username, firstname, lastname, userimage from public.users inner join public.request on username=rec where rec=$1 and sent=$2", [req.body.searchfriend,req.session.user.username,], function (error, outgoings) {
+		pool.query("select username, firstname, lastname, userimage from users inner join request on username=rec where rec=$1 and sent=$2", [req.body.searchfriend,req.session.user.username,], function (error, outgoings) {
 			if(error) console.log(error);
 			console.log(outgoings.rows);
 			if(outgoings.rows == 0){
 				outgoings.rows = null;
 			}
 		if (friends.rows == null && incomings.rows == null && outgoings.rows == null){
-		pool.query("select username, firstname, lastname, userimage from public.users where username=$1", [req.body.searchfriend], function (error, results) {
+		pool.query("select username, firstname, lastname, userimage from users where username=$1", [req.body.searchfriend], function (error, results) {
 			if(error) console.log(error);
 			console.log(results.rows);
 			if(results.rows == 0){

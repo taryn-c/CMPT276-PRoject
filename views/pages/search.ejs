@@ -126,7 +126,7 @@
         <form method="POST" action="/removeFriend" target="votar">
             <div style="width: 50%;  display: inline;">
               <input type="hidden" name="senderdecline" id="user_Id" value="<%= incoming[i].username %>">
-              <button type="submit" id="cancel_friend" class="reject" id="<%= incoming[i].username %>c" onclick="declineRequest('<%= incoming[i].username %>')"
+              <button type="submit" class="reject" id="<%= incoming[i].username %>c" onclick="declineRequest('<%= incoming[i].username %>')"
                 style="width: 8em">Cancel</button>
             </div>
         </form>
