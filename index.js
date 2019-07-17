@@ -497,8 +497,10 @@ app.get('/forum-home', loginRequired, async (req, res)=> {
     try {
       const client = await pool.connect();
       await client.query('select * from topics left join users on topics.topic_by= users.username order by topic_id desc limit 5', function(error, result){
-        const results = { 'results': (result) ? result.rows : null};
-        res.render('pages/forum', results );
+        if(result.rows == 0){
+          result.rows = null;
+        }
+        res.render('pages/forum', {results: result.rows, user: req.session.user.username });
         client.release();
       });
 

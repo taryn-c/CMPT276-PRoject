@@ -8,30 +8,33 @@
   <body >
   <% include ../partials/navprofile.ejs %>
   <br>
-  <div>
-    <div style="float:left; margin-left:20px">
+    <div style="margin-left: 20px;">
       <h3>GitFit Forum</h3>
       <br>
       <button type= "button" class="btn btn-info" onclick='window.location.href="/addTopic"'>
        Create New Discussion</button>
       <br>
-      <h4 style="margin-top:50px;">Recent Topics</h4><br>
+    </div>
+    <div style="margin-left:20px;">
+
+      <h4 style="margin-top:50px;">Recent Discussions</h4><br>
+      <ul class="list-group list-group-flush">
         <%results.forEach(function(topic) { %>
-          <h6 style="margin-left:5px;"><a href="/topic/<%=topic.topic_id%>"> <%=topic.topic_subject%> </a></h6><br>
+          <li class="list-group-item" style="background-color:whitesmoke;><a href="/topic/<%=topic.topic_id%>"> <%=topic.topic_subject%> </a></li><br>
         <%})%>
-
+      </ul>
     </div>
 
-    <div style="float:left; margin-top:127px; margin-left:100px;">
+    <div style="margin-left:20px;">
       <br>
-      <h4> My Topics</h4> <br>
-      <%results.forEach(function(r) {
-          if(r.username==r.topic_by){%>
-
-            <h6 style="margin-left:3px;"><a href="/topic/<%=r.topic_id%>"><%=r.topic_subject%></a></h6><br>
-
-        <%}})%>
+        <h4> My Discussions</h4> <br>
+        <ul class="list-group list-group-flush">
+        <%results.forEach(function(r) {
+            if(user==r.topic_by){%>
+              <li class="list-group-item" style="background-color:whitesmoke;><a href="/topic/<%=r.topic_id%>"><%=r.topic_subject%></a></li><br>
+          <%}})%>
+        </ul>
     </div>
-  </div>
+
   </body>
 </html>
