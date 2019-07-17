@@ -99,14 +99,14 @@
                     <p class="usercard-username">@<%= session.user.incReq[i].sent %></p>
                     <form method="POST" action="/addFriend">
                       <div style="width: 50%; display: inline;">
-                        <input type="hidden" name="sender" id="sender" value="<%= session.user.incReq[i].sent %>">
+                        <input type="hidden" name="senderadd" id="sender" value="<%= session.user.incReq[i].sent %>">
                         <button type="submit" class="accept"
                           style="width: 8em">Accept</button>
                       </div>
                       </form>
                       <form method="POST" action="/removeFriend">
                       <div style="width: 50%;  display: inline;">
-                        <input type="hidden" name="sender" id="user_Id" value="<%= session.user.incReq[i].sent %>">
+                        <input type="hidden" name="senderdecline" id="user_Id" value="<%= session.user.incReq[i].sent %>">
                         <button type="submit" id="cancel_friend" class="reject"
                           style="width: 8em">Cancel</button>
                       </div>
