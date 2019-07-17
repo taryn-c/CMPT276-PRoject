@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="utf-8">
-    <title>Calories Analytics</title>
+    <title>Today's Progress</title>
     <% include ../partials/head.ejs %>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
   </head>
@@ -14,7 +14,7 @@
           <form action="/api/calories" method="POST">
               <h2 class="text-center">Input Workout Info</h2>
               <div class="form-group">
-                <input type="number" class="form-control" name="caloriesConsumed" placeholder="Calories-consumed (not used in calories bured calculation)" required>
+                <input type="number" class="form-control" name="caloriesConsumed" placeholder="Calories-consumed (just for record)" required>
               </div>
               <div class ="col-md-auto">
                   <p>Physical Activity:</p>
@@ -60,6 +60,13 @@
                   <option value =7.0>soccer, casual, general</option>
                   <option value =7.3>squash, general</option>
                   <option value =8.0>tennis, singles</option>
+                  <option value =7.3>dancing aerobic, general</option>
+                  <option value =9.5>dancing aerobic, step, with 10 - 12 inch step</option>
+                  <option value =5.0>dancing aerobic, low impact</option>
+                  <option value =2.5>yoga, Hatha</option>
+                  <option value =4.0>yoga, Power</option>
+                  <option value =2.0>yoga, Nadisodhana</option>
+                  <option value =3.3>yoga, Surya Namaskar</option>
               </select>
               </div>
               <br>
@@ -80,6 +87,7 @@
           </form>
 
       </div>
+  
   </main>
 
   </body>
