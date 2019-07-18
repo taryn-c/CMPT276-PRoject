@@ -12,12 +12,26 @@
   <div class="container topic-form" style="margin-top:5%; margin-bottom:5%; width:70%">
     <form method="post" action="/postTopic">
       <div class="form-group">
+        <label for="category">Category</label>
+        <select class="selectpicker show-tick" name="category">
+          <option value=1>Body Building</option>
+          <option value=2>Losing Fat</option>
+          <option value=3>Gaining Weight</option>
+          <option value=4>Injuries</option>
+          <option value=5>Sports</option>
+          <option value=6>Nutrition</option>
+          <option value=7>Supplements</option>
+          <option value=8>Motivation</option>
+          <option value=9>Miscellaneous</option>
+        </select>
+      </div>
+      <div class="form-group">
         <label for="topic">Title</label>
-        <input id="topic" name="topic" type="text" class="form-control" placeholder="Topic">
+        <input id="topic" name="topic" type="text" class="form-control" placeholder="Topic" required>
       </div>
       <div class="form-group">
         <label for="content">Content</label>
-        <textarea style="width: 100%; height: 150px;" id="content" name="content"  class="form-control" placeholder=""></textarea>
+        <textarea style="width: 100%; height: 150px;" id="content" name="content"  class="form-control" placeholder="" required></textarea>
       </div>
       <div class="form-group">
         <button type="submit" class="btn btn-info">Create</button>

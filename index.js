@@ -497,9 +497,6 @@ app.get('/forum-home', loginRequired, async (req, res)=> {
     try {
       const client = await pool.connect();
       await client.query('select * from topics left join users on topics.topic_by= users.username order by topic_id desc limit 5', function(error, result){
-        if(result.rows == 0){
-          result.rows = null;
-        }
         res.render('pages/forum', {results: result.rows, user: req.session.user.username });
         client.release();
       });
@@ -517,7 +514,7 @@ app.get('/addTopic', loginRequired, function(req, res){
 app.post('/postTopic', loginRequired, async (req, res) => {
     try {
       const client = await pool.connect();
-      await client.query("insert into topics(topic_subject, topic_by, topic_content) values($1, $2, $3)",[req.body.topic, req.session.user.username, req.body.content]);
+      await client.query("insert into topics(topic_subject, topic_by, topic_content, topic_cat) values($1, $2, $3, $4)",[req.body.topic, req.session.user.username, req.body.content, req.body.category]);
       res.redirect('/forum-home');
       client.release();
     } catch (err) {

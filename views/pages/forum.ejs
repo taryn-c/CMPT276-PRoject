@@ -20,7 +20,7 @@
       <h4 style="margin-top:50px;">Recent Discussions</h4><br>
       <ul class="list-group list-group-flush">
         <%results.forEach(function(topic) { %>
-          <li class="list-group-item" style="background-color:whitesmoke;><a href="/topic/<%=topic.topic_id%>"> <%=topic.topic_subject%> </a></li><br>
+          <li class="list-group-item" style="background-color:whitesmoke;"> <a href="/topic/<%=topic.topic_id%>"> <%=topic.topic_subject%> </a></li><br>
         <%})%>
       </ul>
     </div>
@@ -31,7 +31,7 @@
         <ul class="list-group list-group-flush">
         <%results.forEach(function(r) {
             if(user==r.topic_by){%>
-              <li class="list-group-item" style="background-color:whitesmoke;><a href="/topic/<%=r.topic_id%>"><%=r.topic_subject%></a></li><br>
+              <li class="list-group-item" style="background-color:whitesmoke;"><a href="/topic/<%=r.topic_id%>"><%=r.topic_subject%></a></li><br>
           <%}})%>
         </ul>
     </div>
