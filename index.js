@@ -107,18 +107,18 @@ function createUser(data, callback) {
 Add calorie progress for user on each day
 */
 
-function addProgress(data, callback) {
+function addProgress(username, data, callback) {
   if (data.caloriesConsumed == null) data.caloriesConsumed = -1;
 	if (data.activityMET == null) return callback('addProgress missing activityMET');
 	if (data.timeExercised == null) return callback('addProgress missing timeExercised');
 	if (data.onDate == null) return callback('addProgress missing onDate');
   if (data.currentWeight == null) return callback('addProgress missing currentWeight');
-	if (data.username == null) return callback('addProgress missing username');
+	if (username == null) return callback('addProgress missing username');
 
   var burned = Math.round(data.timeExercised * 0.0175 * data.activityMET * (data.currentWeight/2.20462));
 
 	pool.query("INSERT INTO public.user_progress (uid, cal_burn, time_spent, on_date, cal_cons, weight) VALUES ($1, $2, $3, $4, $5, $6);",
-		[data.username, burned, data.timeExercised, data.onDate, data.caloriesConsumed, data.currentWeight], callback);
+		[username, burned, data.timeExercised, data.onDate, data.caloriesConsumed, data.currentWeight], callback);
 }
 
 function loginUser(data, callback) {
@@ -388,7 +388,7 @@ app.post("/api/login", function(req, res) {
 })
 
 app.post('/api/calories', loginRequired, function(req, res) {
-	addProgress(req.body, function(error, data) {
+	addProgress(req.session.user.username, req.body, function(error, data) {
 		if (error) {
 			res.status(400);
 			res.send('ERROR. Query failed, check console for more info.');

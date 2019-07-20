@@ -22,7 +22,7 @@
                       <form action="/api/calories" method="POST">
                           <div class="form-group"><input type="number" class="form-control" name="caloriesConsumed"placeholder="Calories-consumed (just for record)" step="1" required min="0" /></div>
                           Not sure how many calories you consumed?
-                          <a href="/calories/lookup" target="_blank">Look it up here.</a><br>
+                          <a target="_blank" class="portfolio-link" data-toggle="modal" href="/pages/calories_lookup">Look it up here.</a><br><br>
                           <div class="form-group"><select class="form-control" select name="activityMET"><optgroup label="This is a group">
                             <p>Physical Activity:</p>
                                 <option value=8.5>bicycling, mountain, general</option>
@@ -159,6 +159,28 @@
             var burned = Math.round(TimeMin * 0.0175 * actMET * (curWeight/2.20462));
             document.getElementById("calBurned").innerHTML = "From the latest entry, you have burned " + burned + " calories.";
         });
+
+        $(document).ready(() => {
+          $("#search-form").on('submit', (event) => {
+            event.preventDefault();
+            $.ajax({
+              type: 'POST',
+              url: '/api/remote/lookup_calories',
+              contentType: "application/json",
+              data: JSON.stringify({query: $("#search").val()}),
+              dataType: 'json',
+              success: (data) => {
+                if (data.success) {
+                  $("#result").removeClass("error");
+                  $("#result").text(`You consumed ${data.calories} calories of ${data.food}.`)
+                } else {
+                  $("#result").addClass("error");
+                  $("#result").text(data.message)
+                }
+              }
+            });
+          })
+        })
         
     
     </script>
