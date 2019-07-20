@@ -222,6 +222,7 @@ app.get('/profile', loginRequired, function(req, res){
 	})
 		res.render('pages/profile', {session:req.session})})
 app.get('/workouts', loginRequired, (req, res) => res.render('pages/workouts', {session:req.session}))
+app.get('/gyms', loginRequired, (req, res) => res.render('pages/gyms', {session:req.session}))
 
 
 // app.listen(PORT, () => console.log(`Listening on ${ PORT }`))
