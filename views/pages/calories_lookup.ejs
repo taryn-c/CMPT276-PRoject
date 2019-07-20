@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Today's Progress</title>
+    <% include ../partials/head.ejs %>
+    <script src="https://code.jquery.com/jquery-1.11.1.js"></script>
+    <style>
+      body {
+        padding-top: 15px;
+        display: flex;
+        align-items: center;
+      }
+
+      main {
+        max-width: 500px;
+        min-height: 300px;
+        text-align: left;
+      }
+
+      #result.error {
+        color: red;
+      }
+    </style>
+  </head>
+
+  <body>
+    <main>
+      <h1> Calories Lookup </h1>
+      Powered by <a href="https://www.nutritionix.com/">Nutritionix</a>.
+
+      <form id="search-form">
+        <input type="text" placeholder="1 Cup of Rice" id="search" />
+        <div id="result"></div>
+      </form>
+    </main>
+  </body>
+
+  <script>
+    $(document).ready(() => {
+      $("#search-form").on('submit', (event) => {
+        event.preventDefault();
+        $.ajax({
+          type: 'POST',
+          url: '/api/remote/lookup_calories',
+          contentType: "application/json",
+          data: JSON.stringify({query: $("#search").val()}),
+          dataType: 'json',
+          success: (data) => {
+            if (data.success) {
+              $("#result").removeClass("error");
+              $("#result").text(`You consumed ${data.calories} calories of ${data.food}.`)
+            } else {
+              $("#result").addClass("error");
+              $("#result").text(data.message)
+            }
+          }
+        });
+      })
+    })
+  </script>
+</html>

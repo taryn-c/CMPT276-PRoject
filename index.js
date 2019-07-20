@@ -3,6 +3,7 @@ const path = require('path')
 const expressSession = require('express-session')
 const app = express();
 const crypto = require('crypto');
+const request = require('request');
 var cors = require('cors')
 var assert= require('assert')
 var http = require('http').createServer(app);
@@ -10,7 +11,8 @@ var io = require('socket.io')(http);
 var multer = require('multer');
 var async = require('async');
 
-
+const NUTRITIONIX_API_KEY = process.env.NUTRITIONIX_API_KEY;
+const NUTRITIONIX_DEV_KEY = process.env.NUTRITIONIX_DEV_KEY;
 const PORT = process.env.PORT || 8080
 const Pool = require('pg').Pool;
 
@@ -209,6 +211,7 @@ app.get('/', loginRequired,(req, res) => res.render('pages/index', {session:req.
 app.get('/login', (req, res) => res.render('pages/login'))
 app.get('/register', (req, res) => res.render('pages/register'))
 app.get('/calories', loginRequired, (req, res) => res.render('pages/calories', {session:req.session}))
+app.get('/calories/lookup', loginRequired, (req, res) => res.render('pages/calories_lookup', {session:req.session}))
 app.get('/chat', loginRequired, (req, res) => res.render('pages/chat', {session:req.session}))
 app.get('/profile', loginRequired, function(req, res){
 	pool.query("select sent from request where rec=$1", [req.session.user.username], function(error, result){
@@ -286,6 +289,30 @@ app.post('/api/register', function(req, res) {
 	});
 });
 
+app.post('/api/remote/lookup_calories', function(req, res) {
+	nutritionixFoodLookup(req.body, (error, data) => {
+		if (error) {
+			res.status(400);
+			res.error('Remote API failure.');
+			console.error(error);
+			return;
+		}
+
+		if (!data.foods) {
+			res.end(JSON.stringify({
+				success: false,
+				message: data.message
+			}));
+			return;
+		}
+
+		res.end(JSON.stringify({
+			success: true,
+			calories: data.foods[0].nf_calories,
+			food: data.foods[0].food_name
+		}));
+	});
+});
 
 app.post("/api/login", function(req, res) {
 	loginUser(req.body, function (error, data) {
@@ -1012,3 +1039,26 @@ app.post('/searchuser', loginRequired, async (req, res)=> {
       res.send("Error " + err);
     }
 });
+
+// Remote API: Nutritionix
+
+// Looks up the calories and other data for food.
+function nutritionixFoodLookup(food, callback) {
+	request({
+		url: 'https://trackapi.nutritionix.com/v2/natural/nutrients',
+		method: 'POST',
+		body: {
+			query: food.query,
+			timezone: "US/Eastern"
+		},
+		json: true,
+		headers: {
+			'x-app-id': NUTRITIONIX_DEV_KEY, 
+			'x-app-key': NUTRITIONIX_API_KEY
+		}
+	}, (err, res, data) => {
+		if (err) return callback(err);
+
+		callback(null, data);
+	})
+}
