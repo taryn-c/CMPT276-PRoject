@@ -2,21 +2,95 @@
 <html lang="en">
   <head>
     <meta charset="utf-8">
-    <title>Today's Progress</title>
+    <title>Calories Analytics</title>
     <% include ../partials/head.ejs %>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="/stylesheets/bootstrap.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Montserrat:400,700">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Kaushan+Script">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Droid+Serif:400,700,400italic,700italic">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto+Slab:400,100,300,700">
+    <link rel="stylesheet" href="/fonts/font-awesome.min.css">
   </head>
 
-  <body>
+  <body id="page-top">
   <% include ../partials/navuser.ejs %>
-  <main>
+  
+      <section id="portfolio" class="bg-light">
+          <div class="container">
+              <div class="row">
+                  <div class="col-lg-12 text-center" style="height: 125px;">
+                      <h2 class="text-uppercase section-heading">Todays progress</h2>
+                      <h3 class="section-subheading text-muted">Input your workout info below</h3>
+                  </div>
+              </div>
+              <div class="row">
+                  <div class="col align-self-center">
+                      <form action="/api/calories" method="POST">
+                          <div class="form-group"><input type="number" class="form-control" name="caloriesConsumed"placeholder="Calories-consumed (just for record)" step="1" required min="0" /></div>
+                          Not sure how many calories you consumed?
+                          <a href="/calories/lookup" target="_blank">Look it up here.</a><br>
+                          <div class="form-group"><select class="form-control" select name="activityMET"><optgroup label="This is a group">
+                            <p>Physical Activity:</p>
+                                <option value=8.5>bicycling, mountain, general</option>
+                                <option value=3.5>bicycling, leisure, 5.5 mph</option>
+                                <option value =5.8>bicycling, leisure, 9.4 mph</option>
+                                <option value =5.0>unicycling</option>
+                                <option value =7.0>bicycling, stationary, general</option>
+                                <option value =3.5>bicycling, stationary, 30-50 watts, very light to light effort</option>
+                                <option value =4.8>bicycling, stationary, 51-89 watts, light-to-moderate effort</option>
+                                <option value =6.8>bicycling, stationary, 90-100 watts, moderate to vigorous effort</option>
+                                <option value =8.8>bicycling, stationary, 101-160 watts, vigorous effort</option>
+                                <option value =11.0>bicycling, stationary, 161-200 watts, vigorous effort</option>
+                                <option value =14.0>bicycling, stationary, 201-270 watts, very vigorous effort</option>
+                                <option value =8.0>calisthenics (e.g., push ups, sit ups, pull-ups, jumping jacks), vigorous effort</option>
+                                <option value =3.8>calisthenics (e.g., push ups, sit ups, pull-ups, lunges), moderate effort</option>
+                                <option value =2.8>calisthenics (e.g., situps, abdominal crunches), light effort</option>
+                                <option value =3.5>calisthenics, light or moderate effort, general (e.g., back exercises), going up & down from floor</option>
+                                <option value =7.0>jogging, general</option>
+                                <option value =13.3>running, marathon</option>
+                                <option value =9.8>running, 6 mph (10 min/mile)</option>
+                                <option value =11.0>running, 7 mph (8.5 min/mile)</option>
+                                <option value =11.8>running, 8 mph (7.5 min/mile)</option>
+                                <option value =12.8>running, 9 mph (6.5 min/mile)</option>
+                                <option value =14.5>running, 10 mph (6 min/mile)</option>
+                                <option value =16.0>running, 11 mph (5.5 min/mile)</option>
+                                <option value =19.0>running, 12 mph (5 min/mile)</option>
+                                <option value =9.0>running, cross country</option>
+                                <option value =5.5>badminton, social singles and doubles, general</option>
+                                <option value =6.5>basketball, general</option>
+                                <option value =9.3>basketball, drills, practice</option>
+                                <option value =3.8>bowling, indoor, bowling alley</option>
+                                <option value =12.8>boxing, in ring, general</option>
+                                <option value =8.0>football, touch, flag, general</option>
+                                <option value =8.0>frisbee, ultimate</option>
+                                <option value =4.8>golf, general</option>
+                                <option value =3.8>gymnastics, general</option>
+                                <option value =7.8>hockey, field</option>
+                                <option value =8.0>hockey, ice, general</option>
+                                <option value =10.0>hockey, ice, competitive</option>
+                                <option value =10.0>soccer, competitive</option>
+                                <option value =7.0>soccer, casual, general</option>
+                                <option value =7.3>squash, general</option>
+                                <option value =8.0>tennis, singles</option>
+                            </optgroup></select></div>
+                          <div class="form-group"><input type="number" class="form-control" name="timeExercised" placeholder="Activity Duration (min)" step="1" required min="0" /></div>
+                          <div class="form-group"><input class="form-control" type="date" name="onDate" required/></div>
+                          <div class="form-group"><input type="number" class="form-control" name="currentWeight" placeholder="Current Weight (lbs)" step="0.01" required min="0" />
+                              <div role="group" class="btn-group d-flex justify-content-center"><button class="btn btn-secondary btn-block" type="submit" style="margin: 10px;">Submit</button><button class="btn btn-secondary btn-block" type="reset" style="margin: 10px;">Reset</button></div>
+                          </div>
+                      </form>
+                  </div>
+              </div>
+          </div>
+      </section>
+      <!--
       <div class="calories-form">
-          <form id="newActivity"action="/api/calories" method="POST">
+          <form action="/api/calories" method="POST">
               <h2 class="text-center">Input Workout Info</h2>
               <div class="form-group">
-                <input type="number" class="form-control" name="caloriesConsumed" placeholder="Calories-consumed (just for record)" required>
-                Not sure how many calories you consumed?
-                <a href="/calories/lookup" target="_blank">Look it up here.</a>
+                <input type="number" class="form-control" name="caloriesConsumed" placeholder="Calories-consumed (not used in calories bured calculation)" required>
               </div>
               <div class ="col-md-auto">
                   <p>Physical Activity:</p>
@@ -62,18 +136,6 @@
                   <option value =7.0>soccer, casual, general</option>
                   <option value =7.3>squash, general</option>
                   <option value =8.0>tennis, singles</option>
-                  <option value =7.3>dancing aerobic, general</option>
-                  <option value =9.5>dancing aerobic, step, with 10 - 12 inch step</option>
-                  <option value =5.0>dancing aerobic, low impact</option>
-                  <option value =2.5>yoga, Hatha</option>
-                  <option value =4.0>yoga, Power</option>
-                  <option value =2.0>yoga, Nadisodhana</option>
-                  <option value =3.3>yoga, Surya Namaskar</option>
-                  <option value =3.5>walking, 3.0 mph, moderate speed, not carrying anything</option>
-                  <option value =4.3>walking, 3.5 mph, brisk speed, not carrying anything</option>
-                  <option value =3.5>walking, 2.5 mph slowly and carrying objects less than 25 lbs</option>
-                  <option value =4.5>walking, 3.0 mph moderately and carrying objects less than 25 lbs, pushing something</option>
-                  <option value =4.8>walking, 3.5 mph, briskly and carrying objects less than 25 lbs</option>
               </select>
               </div>
               <br>
@@ -92,22 +154,21 @@
               <button type="submit" class="btn btn-primary">Add to record</button>
               </div>
           </form>
-          <p id="calBurned"></p>
+
       </div>
-  <script>
+      -->
+      <script>
 
-    var activityform = document.getElementById("newActivity");
-    activityform.addEventListener("input", function () {
-        var TimeMin = document.getElementById("newActivity").timeExercised.value;
-        var curWeight = document.getElementById("newActivity").currentWeight.value;
-        var actMET = document.getElementById("newActivity").activityMET.value;
-        var burned = Math.round(TimeMin * 0.0175 * actMET * (curWeight/2.20462));
-        document.getElementById("calBurned").innerHTML = "From the latest entry, you have burned " + burned + " calories.";
-    });
+        var activityform = document.getElementById("newActivity");
+        activityform.addEventListener("input", function () {
+            var TimeMin = document.getElementById("newActivity").timeExercised.value;
+            var curWeight = document.getElementById("newActivity").currentWeight.value;
+            var actMET = document.getElementById("newActivity").activityMET.value;
+            var burned = Math.round(TimeMin * 0.0175 * actMET * (curWeight/2.20462));
+            document.getElementById("calBurned").innerHTML = "From the latest entry, you have burned " + burned + " calories.";
+        });
+        
     
-
-  </script>
-  </main>
-
+    </script>
   </body>
 </html>
