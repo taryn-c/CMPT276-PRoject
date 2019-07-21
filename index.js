@@ -13,6 +13,7 @@ var async = require('async');
 
 const NUTRITIONIX_API_KEY = process.env.NUTRITIONIX_API_KEY;
 const NUTRITIONIX_DEV_KEY = process.env.NUTRITIONIX_DEV_KEY;
+const GOOGLE_API_KEY = process.env.GOOGLE_API_KEY;
 const PORT = process.env.PORT || 8080
 const Pool = require('pg').Pool;
 
@@ -43,8 +44,8 @@ dailygoal(username REFERENCES users:username, goalnum:int, goal:text)
 
 
 */
-
-/*var pool = new Pool({
+/*
+var pool = new Pool({
  user: process.env.DB_USER || 'postgres',
  password: process.env.DB_PASS || 'root',
  host: process.env.DB_HOST || 'localhost',
