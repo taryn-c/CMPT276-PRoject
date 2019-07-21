@@ -21,12 +21,12 @@ const ADMIN_LEVEL_REGULAR_ADMIN = 1;
 const ADMIN_LEVEL_SUPER_ADMIN = 2;
 
 //Connect to Postgres database
-/*
+
  var pool = new Pool({
  connectionString: process.env.DATABASE_URL, ssl: true
  });
 
-*/
+
 
 // DATABASE SCHEMAS Version 1: 07-12
 /*
@@ -44,12 +44,12 @@ dailygoal(username REFERENCES users:username, goalnum:int, goal:text)
 
 */
 
-var pool = new Pool({
+/*var pool = new Pool({
  user: process.env.DB_USER || 'postgres',
  password: process.env.DB_PASS || 'root',
  host: process.env.DB_HOST || 'localhost',
  database: process.env.DB_DATABASE || 'postgres'
-});
+}); */
 
 
 // Creates a consistent hash for a username that shouldn't be able to be
@@ -524,7 +524,7 @@ app.post('/api/deleteGoal', loginRequired, function(req,res){
 app.get('/forum-home', loginRequired, async (req, res)=> {
     try {
       const client = await pool.connect();
-      await client.query('select * from topics left join users on topics.topic_by= users.username order by topic_id desc limit 5', function(error, result){
+      await client.query('select * from topics left join categories on topics.topic_cat=categories.cat_id order by topic_id desc limit 5', function(error, result){
         res.render('pages/forum', {results: result.rows, user: req.session.user.username });
         client.release();
       });
@@ -1054,7 +1054,7 @@ function nutritionixFoodLookup(food, callback) {
 		},
 		json: true,
 		headers: {
-			'x-app-id': NUTRITIONIX_DEV_KEY, 
+			'x-app-id': NUTRITIONIX_DEV_KEY,
 			'x-app-key': NUTRITIONIX_API_KEY
 		}
 	}, (err, res, data) => {

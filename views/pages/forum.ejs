@@ -6,34 +6,127 @@
     <% include ../partials/head.ejs %>
   </head>
   <body >
-  <% include ../partials/navprofile.ejs %>
+  <% include ../partials/navuser.ejs %>
   <br>
     <div style="margin-left: 20px;">
       <h3>GitFit Forum</h3>
       <br>
-      <button type= "button" class="btn btn-info" onclick='window.location.href="/addTopic"'>
+      <button type= "button" class="btn btn-info btn-dark" onclick='window.location.href="/addTopic"'>
        Create New Discussion</button>
       <br>
     </div>
     <div style="margin-left:20px;">
-
       <h4 style="margin-top:50px;">Recent Discussions</h4><br>
-      <ul class="list-group list-group-flush">
-        <%results.forEach(function(topic) { %>
-          <li class="list-group-item" style="background-color:whitesmoke;"> <a href="/topic/<%=topic.topic_id%>"> <%=topic.topic_subject%> </a></li><br>
+      <table class="table table-striped table-hover table-dark">
+        <thead>
+          <tr>
+            <th scope="col">Topic</th>
+            <th scope="col">Category</th>
+            <th scope="col">Author</th>
+          </tr>
+        </thead>
+            <%results.forEach(function(topic) { %>
+              <tbody>
+                <tr>
+                  <td><a href="/topic/<%=topic.topic_id%>"> <%=topic.topic_subject%> </a></td>
+                  <%if(topic.topic_cat==1){%>
+                  <td>Body Building</td>
+                  <td><%=topic.topic_by%></td>
+                  <%}%>
+                  <% if(topic.topic_cat==2){%>
+                  <td>Losing Fat</td>
+                  <td><%=topic.topic_by%></td>
+                  <%}%>
+                  <% if(topic.topic_cat==3){%>
+                  <td>Gaining Weight</td>
+                  <td><%=topic.topic_by%></td>
+                  <%}%>
+                  <% if(topic.topic_cat==4){%>
+                  <td>Injuries</td>
+                  <td><%=topic.topic_by%></td>
+                  <%}%>
+                  <% if(topic.topic_cat==5){%>
+                  <td>Sports</td>
+                  <td><%=topic.topic_by%></td>
+                  <%}%>
+                  <% if(topic.topic_cat==6){%>
+                  <td>Nutrition</td>
+                  <td><%=topic.topic_by%></td>
+                  <%}%>
+                  <% if(topic.topic_cat==7){%>
+                  <td>Supplements</td>
+                  <td><%=topic.topic_by%></td>
+                  <%}%>
+                  <% if(topic.topic_cat==8){%>
+                  <td>Motivation</td>
+                  <td><%=topic.topic_by%></td>
+                  <%}%>
+                  <%if(topic.topic_cat==9){%>
+                  <td>Miscellaneous</td>
+                  <td><%=topic.topic_by%></td>
+                  <%}%>
+                </tr>
+              </tbody>
         <%})%>
-      </ul>
+      </table>
     </div>
 
     <div style="margin-left:20px;">
       <br>
         <h4> My Discussions</h4> <br>
-        <ul class="list-group list-group-flush">
-        <%results.forEach(function(r) {
-            if(user==r.topic_by){%>
-              <li class="list-group-item" style="background-color:whitesmoke;"><a href="/topic/<%=r.topic_id%>"><%=r.topic_subject%></a></li><br>
-          <%}})%>
-        </ul>
+        <table class="table table-striped table-hover table-dark">
+          <thead>
+            <tr>
+              <th scope="col">Topic</th>
+              <th scope="col">Category</th>
+              <th scope="col">Author</th>
+            </tr>
+          </thead>
+            <%results.forEach(function(topic) {
+              if(user==topic.topic_by){%>
+                <tr>
+                  <td><a href="/topic/<%=topic.topic_id%>"> <%=topic.topic_subject%> </a></td>
+                  <%if(topic.topic_cat==1){%>
+                  <td>Body Building</td>
+                  <td><%=topic.topic_by%></td>
+                  <%}%>
+                  <% if(topic.topic_cat==2){%>
+                  <td>Losing Fat</td>
+                  <td><%=topic.topic_by%></td>
+                  <%}%>
+                  <% if(topic.topic_cat==3){%>
+                  <td>Gaining Weight</td>
+                  <td><%=topic.topic_by%></td>
+                  <%}%>
+                  <% if(topic.topic_cat==4){%>
+                  <td>Injuries</td>
+                  <td><%=topic.topic_by%></td>
+                  <%}%>
+                  <% if(topic.topic_cat==5){%>
+                  <td>Sports</td>
+                  <td><%=topic.topic_by%></td>
+                  <%}%>
+                  <% if(topic.topic_cat==6){%>
+                  <td>Nutrition</td>
+                  <td><%=topic.topic_by%></td>
+                  <%}%>
+                  <% if(topic.topic_cat==7){%>
+                  <td>Supplements</td>
+                  <td><%=topic.topic_by%></td>
+                  <%}%>
+                  <% if(topic.topic_cat==8){%>
+                  <td>Motivation</td>
+                  <td><%=topic.topic_by%></td>
+                  <%}%>
+                  <%if(topic.topic_cat==9){%>
+                  <td>Miscellaneous</td>
+                  <td><%=topic.topic_by%></td>
+                  <%}%>
+                </tr>
+              </tbody>
+              <%}%>
+          <%})%>
+        </table>
     </div>
 
   </body>
