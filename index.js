@@ -544,6 +544,7 @@ app.post('/postTopic', loginRequired, async (req, res) => {
     try {
       const client = await pool.connect();
       await client.query("insert into topics(topic_subject, topic_by, topic_content, topic_cat) values($1, $2, $3, $4)",[req.body.topic, req.session.user.username, req.body.content, req.body.category]);
+      console.log(req.body.content);
       res.redirect('/forum-home');
       client.release();
     } catch (err) {
@@ -580,6 +581,19 @@ app.post('/postReply/:id', async(req, res) =>{
     res.send(err);
   }
 
+});
+
+app.post('/forum-search', async(req, res) => {
+  try{
+    const client=await pool.connect();
+
+    await client.query("select * from topics full join categories on topics.topic_cat=categories.cat_id where topics.topic_content like $1 OR topics.topic_subject like $1 OR categories.cat_name like $1 OR categories.cat_search like $1",['%'+req.body.search+'%'],function(error, result){
+      res.render('pages/forum-search', {results:result});
+    });
+  }  catch (err){
+      console.error(err);
+      res.send(err);
+    }
 });
 
 

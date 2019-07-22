@@ -11,8 +11,27 @@
     <div style="margin-left: 20px;">
       <h3>GitFit Forum</h3>
       <br>
+
       <button type= "button" class="btn btn-info btn-dark" onclick='window.location.href="/addTopic"'>
        Create New Discussion</button>
+        <br>
+        <br>
+       	<div class="row">
+            <div class="col-sm-6">
+                    <form class="card card-sm" method="post" action="/forum-search" >
+                          <div class="card-body row no-gutters">
+                               <div class="col">
+                                   <input class="form-control form-control-lg form-control-borderless" name="search" type="search" placeholder="Search topics or keywords">
+                               </div>
+
+                               <div class="col-auto">
+                                   <button class="btn btn-lg btn-dark" type="submit" onclick='window.location.href="/forum-search"'>Search</button>                                   </div>
+                                           <!--end of col-->
+                          </div>
+                     </form>
+                </div>
+                               <!--end of col-->
+        </div>
       <br>
     </div>
     <div style="margin-left:20px;">
@@ -29,39 +48,39 @@
               <tbody>
                 <tr>
                   <td><a href="/topic/<%=topic.topic_id%>"> <%=topic.topic_subject%> </a></td>
-                  <%if(topic.topic_cat==1){%>
+                  <%if(topic.topic_cat==10){%>
                   <td>Body Building</td>
                   <td><%=topic.topic_by%></td>
                   <%}%>
-                  <% if(topic.topic_cat==2){%>
+                  <% if(topic.topic_cat==11){%>
                   <td>Losing Fat</td>
                   <td><%=topic.topic_by%></td>
                   <%}%>
-                  <% if(topic.topic_cat==3){%>
+                  <% if(topic.topic_cat==12){%>
                   <td>Gaining Weight</td>
                   <td><%=topic.topic_by%></td>
                   <%}%>
-                  <% if(topic.topic_cat==4){%>
+                  <% if(topic.topic_cat==13){%>
                   <td>Injuries</td>
                   <td><%=topic.topic_by%></td>
                   <%}%>
-                  <% if(topic.topic_cat==5){%>
+                  <% if(topic.topic_cat==14){%>
                   <td>Sports</td>
                   <td><%=topic.topic_by%></td>
                   <%}%>
-                  <% if(topic.topic_cat==6){%>
+                  <% if(topic.topic_cat==15){%>
                   <td>Nutrition</td>
                   <td><%=topic.topic_by%></td>
                   <%}%>
-                  <% if(topic.topic_cat==7){%>
+                  <% if(topic.topic_cat==16){%>
                   <td>Supplements</td>
                   <td><%=topic.topic_by%></td>
                   <%}%>
-                  <% if(topic.topic_cat==8){%>
+                  <% if(topic.topic_cat==17){%>
                   <td>Motivation</td>
                   <td><%=topic.topic_by%></td>
                   <%}%>
-                  <%if(topic.topic_cat==9){%>
+                  <%if(topic.topic_cat==18){%>
                   <td>Miscellaneous</td>
                   <td><%=topic.topic_by%></td>
                   <%}%>
@@ -86,39 +105,39 @@
               if(user==topic.topic_by){%>
                 <tr>
                   <td><a href="/topic/<%=topic.topic_id%>"> <%=topic.topic_subject%> </a></td>
-                  <%if(topic.topic_cat==1){%>
+                  <%if(topic.topic_cat==10){%>
                   <td>Body Building</td>
                   <td><%=topic.topic_by%></td>
                   <%}%>
-                  <% if(topic.topic_cat==2){%>
+                  <% if(topic.topic_cat==11){%>
                   <td>Losing Fat</td>
                   <td><%=topic.topic_by%></td>
                   <%}%>
-                  <% if(topic.topic_cat==3){%>
+                  <% if(topic.topic_cat==12){%>
                   <td>Gaining Weight</td>
                   <td><%=topic.topic_by%></td>
                   <%}%>
-                  <% if(topic.topic_cat==4){%>
+                  <% if(topic.topic_cat==13){%>
                   <td>Injuries</td>
                   <td><%=topic.topic_by%></td>
                   <%}%>
-                  <% if(topic.topic_cat==5){%>
+                  <% if(topic.topic_cat==14){%>
                   <td>Sports</td>
                   <td><%=topic.topic_by%></td>
                   <%}%>
-                  <% if(topic.topic_cat==6){%>
+                  <% if(topic.topic_cat==15){%>
                   <td>Nutrition</td>
                   <td><%=topic.topic_by%></td>
                   <%}%>
-                  <% if(topic.topic_cat==7){%>
+                  <% if(topic.topic_cat==16){%>
                   <td>Supplements</td>
                   <td><%=topic.topic_by%></td>
                   <%}%>
-                  <% if(topic.topic_cat==8){%>
+                  <% if(topic.topic_cat==17){%>
                   <td>Motivation</td>
                   <td><%=topic.topic_by%></td>
                   <%}%>
-                  <%if(topic.topic_cat==9){%>
+                  <%if(topic.topic_cat==18){%>
                   <td>Miscellaneous</td>
                   <td><%=topic.topic_by%></td>
                   <%}%>
