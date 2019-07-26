@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="utf-8">
-    <title>Calories Analytics</title>
+    <title>Today's Progress</title>
     <% include ../partials/head.ejs %>
   </head>
 
@@ -13,7 +13,7 @@
           <div class="container">
               <div class="row">
                   <div class="col-lg-12 text-center" style="height: 125px;">
-                      <h2 class="text-uppercase section-heading">Todays progress</h2>
+                      <h2 class="text-uppercase section-heading">Today's progress</h2>
                       <h3 class="section-subheading text-muted">Input your workout info below</h3>
                   </div>
               </div>
@@ -70,10 +70,13 @@
                           <div class="form-group"><input type="number" class="form-control" name="timeExercised" placeholder="Activity Duration (min)" step="1" required min="0" /></div>
                           <div class="form-group"><input class="form-control" type="date" name="onDate" required/></div>
                           <div class="form-group"><input type="number" class="form-control" name="currentWeight" placeholder="Current Weight (lbs)" step="0.01" required min="0" />
-                              <div role="group" class="btn-group d-flex justify-content-center"><button class="btn btn-secondary btn-block" type="submit" style="margin: 10px;">Submit</button><button class="btn btn-secondary btn-block" type="reset" style="margin: 10px;">Reset</button></div>
+                              <div role="group" class="btn-group d-flex justify-content-center"><button class="btn btn-secondary btn-block" onclick="location.href='#portfolioModal3';" type="submit" style="margin: 10px;">Submit</button><button class="btn btn-secondary btn-block" type="reset" style="margin: 10px;">Reset</button></div>
                           </div>
                       </form>
                   </div>
+              </div>
+              <div class="row">
+                  <p id="calBurned"></p>
               </div>
           </div>
       </section>
@@ -152,11 +155,13 @@
       <script>
 
         var activityform = document.getElementById("newActivity");
+        console.log(activityform);
         activityform.addEventListener("input", function () {
             var TimeMin = document.getElementById("newActivity").timeExercised.value;
             var curWeight = document.getElementById("newActivity").currentWeight.value;
             var actMET = document.getElementById("newActivity").activityMET.value;
             var burned = Math.round(TimeMin * 0.0175 * actMET * (curWeight/2.20462));
+            console.log(burned);
             document.getElementById("calBurned").innerHTML = "From the latest entry, you have burned " + burned + " calories.";
         });
 
@@ -182,7 +187,6 @@
           })
         })
         
-    
     </script>
   </body>
 </html>
