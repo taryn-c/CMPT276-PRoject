@@ -22,11 +22,11 @@ const ADMIN_LEVEL_REGULAR_ADMIN = 1;
 const ADMIN_LEVEL_SUPER_ADMIN = 2;
 
 //Connect to Postgres database
-/*
+
  var pool = new Pool({
  connectionString: process.env.DATABASE_URL, ssl: true
  });
-*/
+
 
 
 // DATABASE SCHEMAS Version 1: 07-12
@@ -44,13 +44,14 @@ dailygoal(username REFERENCES users:username, goalnum:int, goal:text)
 
 
 */
-
+/*
 var pool = new Pool({
  user: process.env.DB_USER || 'postgres',
  password: process.env.DB_PASS || 'root',
  host: process.env.DB_HOST || 'localhost',
  database: process.env.DB_DATABASE || 'postgres'
-});
+}); */
+
 
 
 // Creates a consistent hash for a username that shouldn't be able to be
@@ -525,7 +526,7 @@ app.post('/api/deleteGoal', loginRequired, function(req,res){
 app.get('/forum-home', loginRequired, async (req, res)=> {
     try {
       const client = await pool.connect();
-      await client.query('select * from topics left join users on topics.topic_by= users.username order by topic_id desc limit 5', function(error, result){
+      await client.query('select * from topics left join categories on topics.topic_cat=categories.cat_id order by topic_id desc limit 5', function(error, result){
         res.render('pages/forum', {results: result.rows, user: req.session.user.username });
         client.release();
       });
@@ -544,6 +545,7 @@ app.post('/postTopic', loginRequired, async (req, res) => {
     try {
       const client = await pool.connect();
       await client.query("insert into topics(topic_subject, topic_by, topic_content, topic_cat) values($1, $2, $3, $4)",[req.body.topic, req.session.user.username, req.body.content, req.body.category]);
+      console.log(req.body.content);
       res.redirect('/forum-home');
       client.release();
     } catch (err) {
@@ -580,6 +582,19 @@ app.post('/postReply/:id', async(req, res) =>{
     res.send(err);
   }
 
+});
+
+app.post('/forum-search', async(req, res) => {
+  try{
+    const client=await pool.connect();
+
+    await client.query("select * from topics full join categories on topics.topic_cat=categories.cat_id where topics.topic_content like $1 OR topics.topic_subject like $1 OR categories.cat_name like $1 OR categories.cat_search like $1",['%'+req.body.search+'%'],function(error, result){
+      res.render('pages/forum-search', {results:result});
+    });
+  }  catch (err){
+      console.error(err);
+      res.send(err);
+    }
 });
 
 
@@ -1055,7 +1070,7 @@ function nutritionixFoodLookup(food, callback) {
 		},
 		json: true,
 		headers: {
-			'x-app-id': NUTRITIONIX_DEV_KEY, 
+			'x-app-id': NUTRITIONIX_DEV_KEY,
 			'x-app-key': NUTRITIONIX_API_KEY
 		}
 	}, (err, res, data) => {

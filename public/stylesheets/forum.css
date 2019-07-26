@@ -1,51 +1,62 @@
 .info {
-  background-color:lightblue;
+  border-top: 1px solid white;
   border-bottom:1px solid black;
   height:85px;
+  color:white;
+
 }
 
 .content{
   border-bottom:1px solid black;
   min-height: 85px;
   height:auto;
-
+  color:black;
 }
 
 
 .reply{
   background-color: azure;
   border-bottom:1px solid black;
+
+  color:white;
 }
 
 .replies{
   border-bottom:1px solid black;
   min-height: 85px;
   height:auto;
+  color:black;
 }
 
 .form{
   width: 50%;
   height: 120px;
+  color:white;
 }
 
 h3 {
   margin-left: 32px;
+  color:white;
 }
 
 h4 {
   margin-left: 12px;
+  color:white;
 }
 
 h5{
   margin-left: 12px;
+  color:white;
 }
 
 h6 {
   margin-left: 12px;
   font-weight: bold;
   font-style: italic;
+  color:white;
 }
 
 p{
   margin-left: 12px;
+  color:white;
 }
