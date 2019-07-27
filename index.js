@@ -236,6 +236,7 @@ io.use((socket, next) => {
 });
 
 var chat_clients = {};
+var chat_clients_socket = {};
 io.on('connection', function(socket) {
   if (socket.request.session.login !== true) {
   	socket.disconnect("This feature requires login.");
@@ -247,6 +248,14 @@ io.on('connection', function(socket) {
   	authorId: session.loginid,
   	author: `${session.user.fname} ${session.user.lname.substring(0, 1).toUpperCase()}.`
   };
+
+  var chat_client_socket_index = 0;
+  if (!chat_clients_socket[session.loginid]) {
+  	chat_clients_socket[session.loginid] = [socket];
+  } else {
+  	chat_client_socket_index = chat_clients_socket[session.loginid].length;
+  	chat_clients_socket[session.loginid].push(socket);
+  }
 
   // When the user connects, send them the user list.
   socket.emit('user list', chat_clients);
@@ -260,20 +269,46 @@ io.on('connection', function(socket) {
     });
   });
 
-  // When the user connects, send a join message to all other clients.
-  io.emit('user joined', {
+  socket.on('direct message', function(msg) {
+  	let target = msg.target;
+  	if (chat_clients[target] == null) {
+  		socket.emit('error', 'Direct message target is unavailable.');
+  		return;
+  	}
+
+  	socket.emit('direct message', {
+  		authorId: client.authorId + "#OUTBOUND",
+  		author: 'You -> ' + chat_clients[target].author,
+  		text: msg.message,
+  		date: Date.now()
+  	});
+
+  	chat_clients_socket[target].forEach(sock => sock.emit('direct message', {
   		...client,
-    	date: Date.now(),
+  		text: msg.message,
+  		date: Date.now()
+  	}));
   });
+
+  // When the user connects, send a join message to all other clients.
+  if (chat_client_socket_index == 0) {
+	  io.emit('user joined', {
+	  		...client,
+	    	date: Date.now(),
+	  });
+	}
 
   // When the user disconnects, send a leave message to all other clients.
   socket.on('disconnect', function(reason) {
-  	io.emit('user left', {
-  		...client,
-    	date: Date.now(),
-  	});
-
-  	delete chat_clients[session.loginid];
+  	chat_clients_socket[session.loginid].splice(chat_client_socket_index, 1);
+  	if (chat_clients_socket[session.loginid].length == 0) {
+  		delete chat_clients_socket[session.loginid];
+  		delete chat_clients[session.loginid];
+	  	io.emit('user left', {
+	  		...client,
+	    	date: Date.now(),
+	  	});
+  	}
   });
 
 });
