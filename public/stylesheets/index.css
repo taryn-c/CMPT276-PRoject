@@ -114,7 +114,16 @@ background-color: #6a7691;
 }
 
 #cal {
-    position:absolute;
+    position:relative;
     bottom: 30px;
-    width: 100%;    
+    width: 100%;
+    margin-left: 20px;
+    margin-top: 10px;
+}
+
+#yourDIV {
+  background-color: #475064;
+  padding: 52.5px 40px;
+  color: white;
+  text-align: center;
 }

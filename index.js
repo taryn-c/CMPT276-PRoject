@@ -99,7 +99,7 @@ function createUser(data, callback) {
 
 	// To do: check for duplicate emails and usernames
 	// if (data.username == pool.query(select * from users where username == data.username))
-	pool.query("INSERT INTO public.users(username, password, firstname, lastname, email, age, weight, height, gender, activity_level, fit_goal, calorie, goalcount, userimage, totalrequest) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15);",
+	pool.query("INSERT INTO public.users(username, password, firstname, lastname, email, age, weight, height, gender, activity_level, fit_goal, calorie, goalcount, userimage, totalrequest, score) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15,0);",
 		[data.username, data.password, data.firstname, data.lastname, data.email, data.age, data.weight, data.height, data.gender, data.activity_level, data.fit_goal, maintcal, goalcount, userImage, 0], callback);
 
 }
@@ -209,7 +209,18 @@ app.use(sessionMiddleware);
 app.set('views', path.join(__dirname, 'views'))
 app.set('view engine', 'ejs')
 
-app.get('/', loginRequired,(req, res) => res.render('pages/index', {session:req.session}))
+app.get('/', loginRequired, async(req, res) => {
+  try {
+    const client = await pool.connect();
+    const result = await client.query("SELECT * FROM users where username != 'admin' order by score desc limit 10", function(error, result){
+      res.render('pages/index', {results:result, session:req.session});
+      client.release();
+    });
+  }catch (err) {
+    console.error(err);
+    res.send("Error " + err);
+  }
+});
 app.get('/login', (req, res) => res.render('pages/login'))
 app.get('/register', (req, res) => res.render('pages/register'))
 app.get('/calories', loginRequired, (req, res) => res.render('pages/calories', {session:req.session}))
@@ -632,6 +643,18 @@ app.post('/forum-search', async(req, res) => {
     }
 });
 
+app.post('/addPoints', async(req, res) => {
+  try{
+    const client=await pool.connect();
+    await client.query("update users set score=(select score from users where username=$1)+$2 where username=$3", [req.session.user.username, req.body.score, req.session.user.username]);
+    res.redirect('/workouts');
+    client.release();
+  }catch (err){
+    console.error(err);
+    res.send(err);
+  }
+
+});
 
 function getFriendRequest(data, callback){
 
