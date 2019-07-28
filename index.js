@@ -211,11 +211,19 @@ app.set('view engine', 'ejs')
 
 app.get('/', loginRequired, async(req, res) => {
   try {
-    const client = await pool.connect();
+	const client = await pool.connect();
     const result = await client.query("SELECT * FROM users where username != 'admin' order by score desc limit 10", function(error, result){
+		client.query("select goalnum, goal from dailygoal where username=$1", [req.session.user.username], function(err, dailygoal){
+			if (err){
+				return console.log(err);
+			}
+	  req.session.user.goals = dailygoal.rows;
+	  console.log(req.session.user);
       res.render('pages/index', {results:result, session:req.session});
-      client.release();
-    });
+	  client.release();
+		});
+	});
+
   }catch (err) {
     console.error(err);
     res.send("Error " + err);
@@ -532,7 +540,7 @@ app.get('/delete-user/:id', async (req, res) => {
 app.post('/api/addGoal', loginRequired, function(req,res){
 	try {
 
-		pool.query('INSERT INTO dailygoal(username, goalnum, goal) VALUES($1,$2,$3);',[req.body.username,req.body.goalcount1,req.body.goal],function(err){
+		pool.query('INSERT INTO dailygoal(username, goalnum, goal) VALUES($1,$2,$3);',[req.session.user.username,req.body.goalcount1,req.body.goal],function(err){
 			if(err){
 				console.log(err);
 			}
@@ -555,7 +563,7 @@ app.post('/api/deleteGoal', loginRequired, function(req,res){
 
 	try {
 
-			pool.query('DELETE FROM dailygoal WHERE (username = $1 AND goalnum = $2);',[req.body.username,req.body.goalcount],function(err){
+			pool.query('DELETE FROM dailygoal WHERE (username = $1 AND goalnum = $2);',[req.session.user.username,req.body.goalcount],function(err){
 				if(err){
 					console.log(err);
 				}
@@ -728,7 +736,7 @@ app.post('/change-picture', (req, res) => {
 			res.render('pages/index.ejs', { session: req.session });
 		}
 		else {
-			if (req.file == undefined) {
+			if (req.file == undefined || req.file == null) {
 				res.redirect('pages/profile', {
 					msg: 'Error: No File Selected!'
 				});
