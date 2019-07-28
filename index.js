@@ -218,7 +218,6 @@ app.get('/', loginRequired, async(req, res) => {
 				return console.log(err);
 			}
 	  req.session.user.goals = dailygoal.rows;
-	  console.log(req.session.user);
       res.render('pages/index', {results:result, session:req.session});
 	  client.release();
 		});
