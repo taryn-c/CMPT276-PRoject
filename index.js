@@ -233,14 +233,30 @@ app.get('/register', (req, res) => res.render('pages/register'))
 app.get('/calories', loginRequired, (req, res) => res.render('pages/calories', {session:req.session}))
 app.get('/calories/lookup', loginRequired, (req, res) => res.render('pages/calories_lookup', {session:req.session}))
 app.get('/chat', loginRequired, (req, res) => res.render('pages/chat', {session:req.session}))
-app.get('/profile', loginRequired, function(req, res){
-	pool.query("select sent from request where rec=$1", [req.session.user.username], function(error, result){
-		if (error){
-			return callback(error);
-		}
-		req.session.incReq = result.rows
-	})
-		res.render('pages/profile', {session:req.session})})
+app.get('/profile', loginRequired, async (req, res) => {
+	try {
+		const client = await pool.connect()
+		const result = await client.query("select sent from request where rec=$1", [req.session.user.username], function (error, result) {
+			if (error) {
+				return callback(error);
+			}
+			if (result.rows > 0) {
+				console.log(result);
+				req.session.user.incReq = result.rows;
+				return callback(result);
+			}
+			console.log(result);
+
+		})
+	}
+	catch (err) {
+		console.error(err);
+		res.send("Error" + err);
+	}
+
+
+	res.render('pages/profile', { session: req.session })
+})
 app.get('/workouts', loginRequired, (req, res) => res.render('pages/workouts', {session:req.session}))
 app.get('/gyms', loginRequired, (req, res) => res.render('pages/gyms', {session:req.session}))
 
@@ -729,6 +745,8 @@ function getFriendList(data, callback){
 
 app.post('/change-picture', (req, res) => {
 
+	console.log(req.file);
+
 	upload(req, res, (err) => {
 		if (err) {
 			console.log(err);
@@ -736,9 +754,9 @@ app.post('/change-picture', (req, res) => {
 		}
 		else {
 			if (req.file == undefined || req.file == null) {
-				res.redirect('pages/profile', {
-					msg: 'Error: No File Selected!'
-				});
+				res.render('pages/profile', {
+					session:req.session,
+					msge: 'Error! Please select a photo' })
 			}
 			else {
 
@@ -751,7 +769,7 @@ app.post('/change-picture', (req, res) => {
 				req.session.user.userImage = req.session.user.username + req.file.originalname;
 				res.render('pages/profile', {
 					session:req.session,
-					msg: 'Photo uploaded succesfully!' })
+					msgs: 'Photo uploaded succesfully!' })
 			};
 		}
 	});
