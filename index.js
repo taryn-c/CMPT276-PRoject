@@ -22,11 +22,11 @@ const ADMIN_LEVEL_REGULAR_ADMIN = 1;
 const ADMIN_LEVEL_SUPER_ADMIN = 2;
 
 //Connect to Postgres database
-/*
+
  var pool = new Pool({
  connectionString: process.env.DATABASE_URL, ssl: true
  });
-*/
+
 
 
 // DATABASE SCHEMAS Version 1: 07-12
@@ -44,14 +44,14 @@ dailygoal(username REFERENCES users:username, goalnum:int, goal:text)
 
 
 */
-
+/*
 var pool = new Pool({
  user: process.env.DB_USER || 'postgres',
  password: process.env.DB_PASS || 'root',
  host: process.env.DB_HOST || 'localhost',
  database: process.env.DB_DATABASE || 'postgres'
 });
-
+*/
 
 
 // Creates a consistent hash for a username that shouldn't be able to be
@@ -1139,11 +1139,6 @@ app.post('/searchuser', loginRequired, async (req, res)=> {
       res.send("Error " + err);
     }
 });
-
-//Google maps API
-const bodyParser = require('body-parser');
-app.use(bodyParser.urlencoded({ extended: true }));
-
 
 // Remote API: Nutritionix
 
