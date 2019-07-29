@@ -12,7 +12,8 @@
   <% include ../partials/navuser.ejs %>
   <% if (session.login) { %>
     <p id = "count" style="display: none"><%= session.user.goalcount %></p>
-    <div align="left">
+  <div class="row">
+    <div class="col-lg-8"align="left">
 
 
     <div id="myDIV" class="header">
@@ -31,6 +32,30 @@
         <li id=<%= session.user.goals[i].goalnum %>><%=(session.user.goals[i].goal) %></li>
       <% }} %>
     </ul>
+  </div>
+  <div class="col-lg-4">
+    <div id="yourDIV" class="header">
+    <h2>Leaderboard</h2></div>
+    <table class="table table-sm table-responsive-md table-hover table-light">
+      <thead>
+        <tr>
+          <th scope="col">#</th>
+          <th scope="col">User</th>
+          <th scope="col">Score</th>
+        </tr>
+      </thead>
+          <%for(var i= 1; i<=results.rowCount; i++) { %>
+            <tbody>
+              <tr>
+                <th scope="row"><%=i%></th>
+                <td><%=results.rows[i-1].username%></td>
+                <td><%=results.rows[i-1].score%></td>
+              </tr>
+            <%}%>
+            </tbody>
+    </table>
+  </div>
+</div>
     <script>
     var count = parseInt(document.getElementById("count").innerText);
 
@@ -139,9 +164,10 @@
 
     </script>
 
+
     <div id="cal">
-      <h3>Calories per day to sustain your goal:</h3>
-      <h4><%= session.user.calorie %></h4>
+      <h5>Calories per day to sustain your goal: <%= session.user.calorie %></h5>
+
     </div>
     <% } else { %>
 

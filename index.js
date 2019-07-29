@@ -99,7 +99,7 @@ function createUser(data, callback) {
 
 	// To do: check for duplicate emails and usernames
 	// if (data.username == pool.query(select * from users where username == data.username))
-	pool.query("INSERT INTO public.users(username, password, firstname, lastname, email, age, weight, height, gender, activity_level, fit_goal, calorie, goalcount, userimage, totalrequest) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15);",
+	pool.query("INSERT INTO public.users(username, password, firstname, lastname, email, age, weight, height, gender, activity_level, fit_goal, calorie, goalcount, userimage, totalrequest, score) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15,0);",
 		[data.username, data.password, data.firstname, data.lastname, data.email, data.age, data.weight, data.height, data.gender, data.activity_level, data.fit_goal, maintcal, goalcount, userImage, 0], callback);
 
 }
@@ -209,20 +209,54 @@ app.use(sessionMiddleware);
 app.set('views', path.join(__dirname, 'views'))
 app.set('view engine', 'ejs')
 
-app.get('/', loginRequired,(req, res) => res.render('pages/index', {session:req.session}))
+app.get('/', loginRequired, async(req, res) => {
+  try {
+	const client = await pool.connect();
+    const result = await client.query("SELECT * FROM users where username != 'admin' order by score desc limit 10", function(error, result){
+		client.query("select goalnum, goal from dailygoal where username=$1", [req.session.user.username], function(err, dailygoal){
+			if (err){
+				return console.log(err);
+			}
+	  req.session.user.goals = dailygoal.rows;
+      res.render('pages/index', {results:result, session:req.session});
+	  client.release();
+		});
+	});
+
+  }catch (err) {
+    console.error(err);
+    res.send("Error " + err);
+  }
+});
 app.get('/login', (req, res) => res.render('pages/login'))
 app.get('/register', (req, res) => res.render('pages/register'))
 app.get('/calories', loginRequired, (req, res) => res.render('pages/calories', {session:req.session}))
 app.get('/calories/lookup', loginRequired, (req, res) => res.render('pages/calories_lookup', {session:req.session}))
 app.get('/chat', loginRequired, (req, res) => res.render('pages/chat', {session:req.session}))
-app.get('/profile', loginRequired, function(req, res){
-	pool.query("select sent from request where rec=$1", [req.session.user.username], function(error, result){
-		if (error){
-			return callback(error);
-		}
-		req.session.incReq = result.rows
-	})
-		res.render('pages/profile', {session:req.session})})
+app.get('/profile', loginRequired, async (req, res) => {
+	try {
+		const client = await pool.connect()
+		const result = await client.query("select sent from request where rec=$1", [req.session.user.username], function (error, result) {
+			if (error) {
+				return callback(error);
+			}
+			if (result.rows > 0) {
+				console.log(result);
+				req.session.user.incReq = result.rows;
+				return callback(result);
+			}
+			console.log(result);
+
+		})
+	}
+	catch (err) {
+		console.error(err);
+		res.send("Error" + err);
+	}
+
+
+	res.render('pages/profile', { session: req.session })
+})
 app.get('/workouts', loginRequired, (req, res) => res.render('pages/workouts', {session:req.session}))
 app.get('/gyms', loginRequired, (req, res) => res.render('pages/gyms', {session:req.session}))
 
@@ -236,6 +270,7 @@ io.use((socket, next) => {
 });
 
 var chat_clients = {};
+var chat_clients_socket = {};
 io.on('connection', function(socket) {
   if (socket.request.session.login !== true) {
   	socket.disconnect("This feature requires login.");
@@ -247,6 +282,14 @@ io.on('connection', function(socket) {
   	authorId: session.loginid,
   	author: `${session.user.fname} ${session.user.lname.substring(0, 1).toUpperCase()}.`
   };
+
+  var chat_client_socket_index = 0;
+  if (!chat_clients_socket[session.loginid]) {
+  	chat_clients_socket[session.loginid] = [socket];
+  } else {
+  	chat_client_socket_index = chat_clients_socket[session.loginid].length;
+  	chat_clients_socket[session.loginid].push(socket);
+  }
 
   // When the user connects, send them the user list.
   socket.emit('user list', chat_clients);
@@ -260,20 +303,46 @@ io.on('connection', function(socket) {
     });
   });
 
-  // When the user connects, send a join message to all other clients.
-  io.emit('user joined', {
+  socket.on('direct message', function(msg) {
+  	let target = msg.target;
+  	if (chat_clients[target] == null) {
+  		socket.emit('error', 'Direct message target is unavailable.');
+  		return;
+  	}
+
+  	socket.emit('direct message', {
+  		authorId: client.authorId + "#OUTBOUND",
+  		author: 'You -> ' + chat_clients[target].author,
+  		text: msg.message,
+  		date: Date.now()
+  	});
+
+  	chat_clients_socket[target].forEach(sock => sock.emit('direct message', {
   		...client,
-    	date: Date.now(),
+  		text: msg.message,
+  		date: Date.now()
+  	}));
   });
+
+  // When the user connects, send a join message to all other clients.
+  if (chat_client_socket_index == 0) {
+	  io.emit('user joined', {
+	  		...client,
+	    	date: Date.now(),
+	  });
+	}
 
   // When the user disconnects, send a leave message to all other clients.
   socket.on('disconnect', function(reason) {
-  	io.emit('user left', {
-  		...client,
-    	date: Date.now(),
-  	});
-
-  	delete chat_clients[session.loginid];
+  	chat_clients_socket[session.loginid].splice(chat_client_socket_index, 1);
+  	if (chat_clients_socket[session.loginid].length == 0) {
+  		delete chat_clients_socket[session.loginid];
+  		delete chat_clients[session.loginid];
+	  	io.emit('user left', {
+	  		...client,
+	    	date: Date.now(),
+	  	});
+  	}
   });
 
 });
@@ -486,7 +555,7 @@ app.get('/delete-user/:id', async (req, res) => {
 app.post('/api/addGoal', loginRequired, function(req,res){
 	try {
 
-		pool.query('INSERT INTO dailygoal(username, goalnum, goal) VALUES($1,$2,$3);',[req.body.username,req.body.goalcount1,req.body.goal],function(err){
+		pool.query('INSERT INTO dailygoal(username, goalnum, goal) VALUES($1,$2,$3);',[req.session.user.username,req.body.goalcount1,req.body.goal],function(err){
 			if(err){
 				console.log(err);
 			}
@@ -509,7 +578,7 @@ app.post('/api/deleteGoal', loginRequired, function(req,res){
 
 	try {
 
-			pool.query('DELETE FROM dailygoal WHERE (username = $1 AND goalnum = $2);',[req.body.username,req.body.goalcount],function(err){
+			pool.query('DELETE FROM dailygoal WHERE (username = $1 AND goalnum = $2);',[req.session.user.username,req.body.goalcount],function(err){
 				if(err){
 					console.log(err);
 				}
@@ -597,6 +666,18 @@ app.post('/forum-search', async(req, res) => {
     }
 });
 
+app.post('/addPoints', async(req, res) => {
+  try{
+    const client=await pool.connect();
+    await client.query("update users set score=(select score from users where username=$1)+$2 where username=$3", [req.session.user.username, req.body.score, req.session.user.username]);
+    res.redirect('/workouts');
+    client.release();
+  }catch (err){
+    console.error(err);
+    res.send(err);
+  }
+
+});
 
 function getFriendRequest(data, callback){
 
@@ -664,16 +745,18 @@ function getFriendList(data, callback){
 
 app.post('/change-picture', (req, res) => {
 
+	console.log(req.file);
+
 	upload(req, res, (err) => {
 		if (err) {
 			console.log(err);
 			res.render('pages/index.ejs', { session: req.session });
 		}
 		else {
-			if (req.file == undefined) {
-				res.redirect('pages/profile', {
-					msg: 'Error: No File Selected!'
-				});
+			if (req.file == undefined || req.file == null) {
+				res.render('pages/profile', {
+					session:req.session,
+					msge: 'Error! Please select a photo' })
 			}
 			else {
 
@@ -686,7 +769,7 @@ app.post('/change-picture', (req, res) => {
 				req.session.user.userImage = req.session.user.username + req.file.originalname;
 				res.render('pages/profile', {
 					session:req.session,
-					msg: 'Photo uploaded succesfully!' })
+					msgs: 'Photo uploaded succesfully!' })
 			};
 		}
 	});

@@ -107,11 +107,25 @@
   margin-top: -5px;
 }
 
+.chat-message.private .chat-message-author {
+  color: #3333ff;
+}
+
 .chat-message.continuation .chat-message-author {
   display: none;
 }
 
 .chat-message.continuation .chat-message-time {
   display: none;
+}
+
+#users a {
+  color: #66d;
+}
+
+#users a:hover {
+  color: #88f;
+  text-decoration: underline;
+  cursor: pointer;
 }
 

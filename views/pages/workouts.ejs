@@ -13,7 +13,7 @@
     <link rel="stylesheet" href="/fonts/font-awesome.min.css">
   </head>
 
-  <body id="page-top">   
+  <body id="page-top">
     <% include ../partials/navuser.ejs %>
   </body>
     <br>
@@ -124,7 +124,7 @@
                                                             <td>3. Cable Crossover</td>
                                                             <td>15 Rep Max</td>
                                                             <td>4 Mins</td>
-                                                        </tr>                                                        
+                                                        </tr>
                                                     </tbody>
                                                 </table>
                                             </div>
@@ -160,7 +160,7 @@
                                                             <td>15 Rep Max</td>
                                                             <td>4 Mins</td>
                                                         </tr>
-                                                        
+
                                                     </tbody>
                                                 </table>
                                             </div>
@@ -195,7 +195,7 @@
                                                             <td>15 Rep Max</td>
                                                             <td>4 Mins</td>
                                                         </tr>
-                                                        
+
                                                     </tbody>
                                                 </table>
                                             </div>
@@ -226,7 +226,7 @@
                                                             <td>8 Rep Max</td>
                                                             <td>4 Mins</td>
                                                         </tr>
-                                                        
+
                                                     </tbody>
                                                 </table>
                                             </div>
@@ -257,11 +257,15 @@
                                                             <td>15 Rep Max</td>
                                                             <td>4 Mins</td>
                                                         </tr>
-                                                        
+
                                                     </tbody>
                                                 </table>
                                             </div>
-                                    <button class="btn btn-secondary" data-dismiss="modal" type="button" style="background-color: #4e4e51;"><i class="fa fa-times"></i><span>&nbsp;Close Workout</span></button></div>
+                                    <button class="btn btn-secondary" data-dismiss="modal" type="button" style="background-color: #4e4e51;"><i class="fa fa-times"></i><span>&nbsp;Close Workout</span></button>
+                                    <br><br><form action="/addPoints" method="post">
+                                    <button name="score" class="btn btn-primary" type="submit" value="10" style="background-color: green;">Complete</button>
+                                    </form></div>
+                                    <p style="font-style:italic;">Completing this workout earns you 10 points</p>
                             </div>
                         </div>
                     </div>
@@ -324,7 +328,7 @@
                                                             <td>3</td>
                                                             <td>20</td>
                                                         </tr>
-                                                        
+
                                             </tbody>
                                         </table>
                                     </div>
@@ -380,7 +384,7 @@
                                                             <td>4</td>
                                                             <td>22 Each</td>
                                                         </tr>
-                                                        
+
                                             </tbody>
                                         </table>
                                     </div>
@@ -430,12 +434,17 @@
                                                             <td>3</td>
                                                             <td>60 Secs</td>
                                                         </tr>
-                                                        
+
                                             </tbody>
                                         </table>
                                     </div>
                                     <br>
-                                    <button class="btn btn-secondary" data-dismiss="modal" type="button" style="background-color: #4e4e51;"><i class="fa fa-times"></i><span>&nbsp;Close Workout</span></button></div>
+                                    <button class="btn btn-secondary" data-dismiss="modal" type="button" style="background-color: #4e4e51;"><i class="fa fa-times"></i><span>&nbsp;Close Workout</span></button>
+                                    <br><br>
+                                    <form action="/addPoints" method="post">
+                                    <button name="score" class="btn btn-primary" type="submit" value="7" style="background-color: green;">Complete</button>
+                                    </form></div>
+                                    <p style="font-style:italic;">Completing this workout earns you 7 points</p>
                             </div>
                         </div>
                     </div>
@@ -474,30 +483,30 @@
                                                         <td>1 x 12</td>
                                                         <td>3 x 6-12</td>
                                                     </tr>
-                                                    
+
                                                     <tr>
                                                         <td>2. Pull Ups</td>
                                                         <td>1 x 12 on pull down</td>
                                                         <td>3 x failure</td>
                                                     </tr>
-                                                    
+
                                                     <tr>
                                                         <td>3. Back Squat</td>
                                                         <td>1 x 12</td>
                                                         <td>3 x 6-12</td>
                                                     </tr>
-                                                    
+
                                                     <tr>
                                                         <td>4. Lying Leg Curl</td>
                                                         <td>-</td>
                                                         <td>3 x 6-12</td>
-                                                    </tr>    
+                                                    </tr>
                                                     <tr>
                                                         <td>5. Standing Dumbbell Shoulder Press</td>
                                                         <td>-</td>
                                                         <td>3 x 6-12</td>
                                                     </tr>
-                                                
+
                                                 </tbody>
                                             </table>
                                         </div>
@@ -510,7 +519,7 @@
                                                         <th style="background-color: #4e4e51;">Exercise</th>
                                                         <th style="background-color: #4e4e51;">Warm up Sets</th>
                                                         <th style="background-color: #4e4e51;">Working Sets</th>
-                                                    </tr>                                            
+                                                    </tr>
                                                 </thead>
                                                 <tbody>
                                                     <tr>
@@ -518,31 +527,31 @@
                                                         <td>1 x 12</td>
                                                         <td>3 x 6-12</td>
                                                     </tr>
-                                                    
+
                                                     <tr>
                                                         <td>2. Barbell Deadlift</td>
                                                         <td>1 x 12</td>
                                                         <td>3 x 6-12</td>
                                                     </tr>
-                                                    
+
                                                     <tr>
                                                         <td>3. Weighted Dip</td>
                                                         <td>1 x 12</td>
                                                         <td>3 x 6-12</td>
                                                     </tr>
-                                                    
+
                                                     <tr>
                                                         <td>4. Barbell Curl</td>
                                                         <td>1 x 12</td>
                                                         <td>3 x 6-12</td>
                                                     </tr>
-                                                    
+
                                                     <tr>
                                                         <td>5. Barbell Romanian Deadlift</td>
                                                         <td>1 x 12</td>
                                                         <td>3 x 6-12</td>
                                                     </tr>
-                                                    
+
                                                     <tr>
                                                         <td>6. Standing Calf Raise</td>
                                                         <td>1 x 12</td>
@@ -593,12 +602,15 @@
                                                         <td>1 x 12</td>
                                                         <td>3 x 6-12</td>
                                                     </tr>
-                                                
+
                                                 </tbody>
                                             </table>
                                         </div>
                                         <button class="btn btn-secondary" data-dismiss="modal" type="button" style="background-color: #4e4e51;"><i class="fa fa-times"></i><span>&nbsp;Close Workout</span></button>
-                                        </div>
+                                        <br><br><form action="/addPoints" method="post">
+                                        <button name="score" class="btn btn-primary" type="submit" value="5" style="background-color: green;">Complete</button>
+                                        </form>                                        </div>
+                                        <p style="font-style:italic;">Completing this workout earns you 5 points</p>
                                 </div>
                             </div>
                         </div>
@@ -678,7 +690,7 @@
                                                                         <td>-</td>
                                                                         <td>45 Secs</td>
                                                                     </tr>
-                                                                    
+
                                                         </tbody>
                                                     </table>
                                                 </div>
@@ -739,7 +751,7 @@
                                                                         <td>-</td>
                                                                         <td>45 Secs</td>
                                                                     </tr>
-                                                                    
+
                                                         </tbody>
                                                     </table>
                                                 </div>
@@ -798,13 +810,16 @@
                                                                         <td>1 Leg Push Up</td>
                                                                         <td>-</td>
                                                                         <td>45 Secs</td>
-                                                                    </tr>                                                                    
+                                                                    </tr>
                                                         </tbody>
                                                     </table>
                                                 </div>
                                                 <br>
                                         <button class="btn btn-secondary" data-dismiss="modal" type="button" style="background-color: #4e4e51;"><i class="fa fa-times"></i><span>&nbsp;Close Workout</span></button>
-                                    </div>
+                                        <br><br><form action="/addPoints" method="post">
+                                        <button name="score" class="btn btn-primary" type="submit" value="7" style="background-color: green;">Complete</button>
+                                        </form>                                    </div>
+                                    <p style="font-style:italic;">Completing this workout earns you 7 points</p>
                                 </div>
                             </div>
                         </div>
@@ -902,7 +917,7 @@
                                                             <td>2</td>
                                                             <td>15 Each</td>
                                                         </tr>
-                                                        
+
                                             </tbody>
                                         </table>
                                     </div>
@@ -967,7 +982,7 @@
                                                             <td>Ab Crunch</td>
                                                             <td>2</td>
                                                             <td>20</td>
-                                                        </tr>    
+                                                        </tr>
                                             </tbody>
                                         </table>
                                     </div>
@@ -1032,7 +1047,7 @@
                                                             <td>Plank</td>
                                                             <td>3</td>
                                                             <td>30 Secs</td>
-                                                        </tr>                                                    
+                                                        </tr>
                                             </tbody>
                                         </table>
                                     </div>
@@ -1100,9 +1115,13 @@
                                             </tbody>
                                         </table>
                                     </div>
-                                    <br>      
+                                    <br>
                                     <button class="btn btn-secondary" data-dismiss="modal" type="button"><i class="fa fa-times"></i><span>&nbsp;Close Workout</span></button>
+                                    <br><br><form action="/addPoints" method="post">
+                                    <button name="score" class="btn btn-primary" type="submit" value="10" style="background-color: green;">Complete</button>
+                                    </form>
                                 </div>
+                                <p style="font-style:italic;">Completing this workout earns you 10 points</p>
                             </div>
                         </div>
                     </div>
