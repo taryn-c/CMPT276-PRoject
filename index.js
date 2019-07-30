@@ -93,13 +93,13 @@ function createUser(data, callback) {
 	if (data.fit_goal == null) return callback('createUser missing fit_goal in 2nd argument');
 
 	if(data.gender == 'male'){
-		var calorie = 66.47 + (13.7 * (2.201 * data.weight) + (5 * data.height) - (6.8 * data.age))
+		var calorie = (4.536 * data.weight) + (6.25* data.height) - (5 * data.age) + 5;
 		calorie = (calorie*data.activity_level)
 		calorie = calorie + data.fit_goal;
 		var userImage = 'default_m.png';
 		}
 	else if (data.gender == 'female'){
-		var calorie = 655.1 + (9.6 * (2.201 * data.weight) + (1.8 * data.height) - (4.7*data.age))
+		var calorie = (4.536 * data.weight) + (6.25* data.height) - (5 * data.age) - 161;
 		calorie = (calorie*data.activity_level)
 		calorie = calorie + data.fit_goal;
 		var userImage = 'default_f.png';
