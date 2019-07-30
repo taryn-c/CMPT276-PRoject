@@ -40,10 +40,19 @@
             </div>
             <div id="chat-users">
                 <strong>Users:</strong>
+                Click on someone's name to send a direct message.
+                
                 <ul id="users"></ul>
             </div>
         </div>
         <form action="" id="chat-form">
+            <select id="chat-target">
+                <optgroup label="Chatrooms">
+                    <option value="#global">Global</option>
+                </optgroup>
+                <optgroup label="Direct Messages" id="chat-target-dms">
+                </optgroup>
+            </select>
             <input id="chat-box" autocomplete="off" />
             <button id="chat-submit">Send</button>
         </form>

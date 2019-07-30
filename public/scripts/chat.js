@@ -9,7 +9,18 @@ $(document).ready(function() {
 
         var message = $('#chat-box').val();
         if (message.trim() != '') {
-          socket.emit('chat message', $('#chat-box').val());
+         var targetList = $("#chat-target");
+          switch (targetList.val()) {
+            case '#global':
+              socket.emit('chat message', $('#chat-box').val());
+              break;
+
+            default:
+              socket.emit('direct message', {
+                message: $('#chat-box').val(),
+                target: targetList.val()
+              });
+          }
           $('#chat-box').val('');
         }
         return false;
@@ -19,6 +30,14 @@ $(document).ready(function() {
         var isContinuation = last_author === msg.authorId && msg.authorId != null;
         onMessageReceived(msg.author, new Date(msg.date), msg.text, isContinuation);
         last_author = msg.authorId;
+        notify();
+    });
+
+    socket.on('direct message', function(msg) {
+        var isContinuation = last_author === (msg.authorId + "#DM") && msg.authorId != null;
+        onMessageReceived(msg.author, new Date(msg.date), msg.text, isContinuation, true);
+        last_author = msg.authorId + "#DM";
+        notify();
     });
 
     socket.on('user joined', function(user) {
@@ -44,14 +63,41 @@ $(document).ready(function() {
 function onUserListUpdate(user_list) {
   var element = $("#users");
   var users = Object.values(user_list)
-    .map(v => v.author)
-    .sort();
+    .sort((a, b) => a.author.localeCompare(b.author));
 
   element.empty();
-  for (var user of users) {
-    var item = $("<li>");
-    item.text(user);
+  for (let user of users) {
+    let item = $("<li>");
+    let link = $("<a>");
+    link.attr('title', 'Send a direct message.');
+    link.on('click', () => {
+      selectTarget(user);
+    })
+
+    link.text(user.author);
+    item.append(link);
     element.append(item);
+  }
+
+  function selectTarget(user) {
+    var targetList = $("#chat-target");
+    var targetDms = $("#chat-target-dms");
+
+    if (user == null) {
+      targetList.val('#global');
+      return;
+    }
+
+    if (targetDms.find(`[value="${user.authorId}"]`).length === 0) {
+      var targetDmOption = $("<option>");
+      targetDmOption.attr('value', user.authorId);
+      targetDmOption.text('@' + user.author);
+      targetDms.append(targetDmOption);
+    }
+
+    targetList.val(user.authorId);
+
+    $("#chat-box").select();
   }
 }
 
@@ -68,7 +114,7 @@ function onStatusReceived(author, date, message) {
   document.querySelector("#messages").appendChild(element);
 }
 
-function onMessageReceived(author, date, message, continuation) {
+function onMessageReceived(author, date, message, continuation, private) {
   var template = document.querySelector("#message-template");
   var element = document.importNode(template.content, true).querySelector(".chat-message");
 
@@ -77,11 +123,22 @@ function onMessageReceived(author, date, message, continuation) {
     element.classList.add('continuation');
   }
 
+  if (private) {
+    element.classList.add('private');
+  }
+
   // Update the data in the cloned element
-  element.querySelector(".chat-message-author").textContent = author;
+  element.querySelector(".chat-message-author").textContent = author + (private ? ' (DIRECT MESSAGE)' : '');
   element.querySelector(".chat-message-time").textContent = date;
   element.querySelector(".chat-message-text").textContent = message;
 
   // Add it to the messages list.
   document.querySelector("#messages").appendChild(element);
+}
+
+function notify() {
+
+        let oldTitle = document.title;
+        document.title = "[NEW MESSAGE]";
+        setTimeout(() => document.title = oldTitle, 2500)
 }

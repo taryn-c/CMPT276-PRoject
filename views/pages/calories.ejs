@@ -149,9 +149,11 @@
               <button type="submit" class="btn btn-primary">Add to record</button>
               </div>
           </form>
+<<<<<<< HEAD
       </div>
       -->
       <script>
+	  
         var activityform = document.getElementById("newActivity");
         console.log(activityform);
         activityform.addEventListener("input", function () {
@@ -162,6 +164,7 @@
             console.log(burned);
             document.getElementById("calBurned").innerHTML = "From the latest entry, you have burned " + burned + " calories.";
         });
+		
         $(document).ready(() => {
           $("#search-form").on('submit', (event) => {
             event.preventDefault();

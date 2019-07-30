@@ -94,10 +94,18 @@
     </style>
     <h2 style="text-align: center; font-family: Arial, Helvetica, sans-serif">All Users</h2>
     <div style="text-align: center">
-        <form action="/searchuser" method="post">
-            <input type="text" name="searchfriend" placeholder="username">
-            <input type="submit" value="search" style="background-color: #3d4453ee; ">
-        </form>
+      <form class="card card-sm" method="post" action="/searchuser" >
+            <div class="card-body row no-gutters">
+                 <div class="col">
+                     <input class="form-control form-control-lg form-control-borderless" name="searchfriend" type="search" placeholder="Search for a username">
+                 </div>
+
+                 <div class="col-auto">
+                     <button class="btn btn-lg btn-dark" type="submit" >Search</button>
+                </div>
+                             <!--end of col-->
+            </div>
+       </form>
     </div>
     <hr>
     <% if (friend != null){ %>

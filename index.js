@@ -3,6 +3,7 @@ const path = require('path')
 const expressSession = require('express-session')
 const app = express();
 const crypto = require('crypto');
+const request = require('request');
 var cors = require('cors')
 var assert= require('assert')
 var http = require('http').createServer(app);
@@ -10,13 +11,29 @@ var io = require('socket.io')(http);
 var multer = require('multer');
 var async = require('async');
 
-
+const NUTRITIONIX_API_KEY = process.env.NUTRITIONIX_API_KEY;
+const NUTRITIONIX_DEV_KEY = process.env.NUTRITIONIX_DEV_KEY;
+const GOOGLE_API_KEY = process.env.GOOGLE_API_KEY;
 const PORT = process.env.PORT || 8080
 const Pool = require('pg').Pool;
 
 const ADMIN_LEVEL_NOT_ADMIN = 0;
 const ADMIN_LEVEL_REGULAR_ADMIN = 1;
 const ADMIN_LEVEL_SUPER_ADMIN = 2;
+
+var curday = function(sp){
+	today = new Date();
+	today.setHours(today.getHours() - 8);
+	var dd = today.getDate();
+	var mm = today.getMonth()+1; //As January is 0.
+	var yyyy = today.getFullYear();
+
+	if(dd<10) dd='0'+dd;
+	if(mm<10) mm='0'+mm;
+	return (yyyy + sp + mm + sp + dd);
+	};
+
+console.log(curday("-"));
 
 //Connect to Postgres database
 
@@ -41,13 +58,14 @@ dailygoal(username REFERENCES users:username, goalnum:int, goal:text)
 
 
 */
-
-
-/* user: process.env.DB_USER || 'postgres',
+/*
+var pool = new Pool({
+ user: process.env.DB_USER || 'postgres',
  password: process.env.DB_PASS || 'root',
  host: process.env.DB_HOST || 'localhost',
  database: process.env.DB_DATABASE || 'postgres'
-});*/
+});
+*/
 
 
 // Creates a consistent hash for a username that shouldn't be able to be
@@ -95,7 +113,7 @@ function createUser(data, callback) {
 
 	// To do: check for duplicate emails and usernames
 	// if (data.username == pool.query(select * from users where username == data.username))
-	pool.query("INSERT INTO public.users(username, password, firstname, lastname, email, age, weight, height, gender, activity_level, fit_goal, calorie, goalcount, userimage, totalrequest) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15);",
+	pool.query("INSERT INTO public.users(username, password, firstname, lastname, email, age, weight, height, gender, activity_level, fit_goal, calorie, goalcount, userimage, totalrequest, score) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15,0);",
 		[data.username, data.password, data.firstname, data.lastname, data.email, data.age, data.weight, data.height, data.gender, data.activity_level, data.fit_goal, maintcal, goalcount, userImage, 0], callback);
 
 }
@@ -105,18 +123,18 @@ function createUser(data, callback) {
 Add calorie progress for user on each day
 */
 
-function addProgress(data, callback) {
+function addProgress(username, data, callback) {
   if (data.caloriesConsumed == null) data.caloriesConsumed = -1;
 	if (data.activityMET == null) return callback('addProgress missing activityMET');
 	if (data.timeExercised == null) return callback('addProgress missing timeExercised');
 	if (data.onDate == null) return callback('addProgress missing onDate');
   if (data.currentWeight == null) return callback('addProgress missing currentWeight');
-	if (data.username == null) return callback('addProgress missing username');
+	if (username == null) return callback('addProgress missing username');
 
   var burned = Math.round(data.timeExercised * 0.0175 * data.activityMET * (data.currentWeight/2.20462));
 
 	pool.query("INSERT INTO public.user_progress (uid, cal_burn, time_spent, on_date, cal_cons, weight) VALUES ($1, $2, $3, $4, $5, $6);",
-		[data.username, burned, data.timeExercised, data.onDate, data.caloriesConsumed, data.currentWeight], callback);
+		[username, burned, data.timeExercised, data.onDate, data.caloriesConsumed, data.currentWeight], callback);
 }
 
 function loginUser(data, callback) {
@@ -205,20 +223,75 @@ app.use(sessionMiddleware);
 app.set('views', path.join(__dirname, 'views'))
 app.set('view engine', 'ejs')
 
-app.get('/', loginRequired,(req, res) => res.render('pages/index', {session:req.session}))
+app.get('/', loginRequired, async(req, res) => {
+  try {
+	const client = await pool.connect();
+    const result = await client.query("SELECT * FROM users where username != 'admin' order by score desc limit 10", function(error, result){
+		client.query("select goalnum, goal from dailygoal where username=$1", [req.session.user.username], function(err, dailygoal){
+			if (err){
+				return console.log(err);
+			}
+	  req.session.user.goals = dailygoal.rows;
+	  client.query("select goalcount from users where username=$1", [req.session.user.username], function(err, goalcount){
+		if (err){
+			return console.log(err);
+		}
+		req.session.user.goalcount = goalcount.rows;
+		client.query("select SUM(cal_cons - cal_burn) as netCal from user_progress where uid=$1 and on_date =$2", [req.session.user.username, curday("-")], function(err, netcal){
+		if (err){
+			return console.log(err);
+		}
+		if (netcal.rows == null)
+		{
+			netcall.rows = 0;
+		}
+		console.log(netcal.rows);
+
+      res.render('pages/index', {results:result, session:req.session, netcal:netcal.rows});
+	  client.release();
+		});
+	});
+
+	});
+});
+
+
+  }catch (err) {
+    console.error(err);
+    res.send("Error " + err);
+  }
+});
 app.get('/login', (req, res) => res.render('pages/login'))
 app.get('/register', (req, res) => res.render('pages/register'))
 app.get('/calories', loginRequired, (req, res) => res.render('pages/calories', {session:req.session}))
+app.get('/calories/lookup', loginRequired, (req, res) => res.render('pages/calories_lookup', {session:req.session}))
 app.get('/chat', loginRequired, (req, res) => res.render('pages/chat', {session:req.session}))
-app.get('/profile', loginRequired, function(req, res){
-	pool.query("select sent from request where rec=$1", [req.session.user.username], function(error, result){
-		if (error){
-			return callback(error);
-		}
-		req.session.incReq = result.rows
-	})
-		res.render('pages/profile', {session:req.session})})
+app.get('/profile', loginRequired, async (req, res) => {
+	try {
+		const client = await pool.connect()
+		const result = await client.query("select sent from request where rec=$1", [req.session.user.username], function (error, result) {
+			if (error) {
+				return callback(error);
+			}
+			if (result.rows > 0) {
+				console.log(result);
+				req.session.user.incReq = result.rows;
+				return callback(result);
+			}
+			console.log(result);
+
+		})
+	}
+	catch (err) {
+		console.error(err);
+		res.send("Error" + err);
+	}
+
+
+	res.render('pages/profile', { session: req.session })
+})
 app.get('/workouts', loginRequired, (req, res) => res.render('pages/workouts', {session:req.session}))
+app.get('/gyms', loginRequired, (req, res) => res.render('pages/gyms', {session:req.session}))
 
 
 // app.listen(PORT, () => console.log(`Listening on ${ PORT }`))
@@ -230,6 +303,7 @@ io.use((socket, next) => {
 });
 
 var chat_clients = {};
+var chat_clients_socket = {};
 io.on('connection', function(socket) {
   if (socket.request.session.login !== true) {
   	socket.disconnect("This feature requires login.");
@@ -241,6 +315,14 @@ io.on('connection', function(socket) {
   	authorId: session.loginid,
   	author: `${session.user.fname} ${session.user.lname.substring(0, 1).toUpperCase()}.`
   };
+
+  var chat_client_socket_index = 0;
+  if (!chat_clients_socket[session.loginid]) {
+  	chat_clients_socket[session.loginid] = [socket];
+  } else {
+  	chat_client_socket_index = chat_clients_socket[session.loginid].length;
+  	chat_clients_socket[session.loginid].push(socket);
+  }
 
   // When the user connects, send them the user list.
   socket.emit('user list', chat_clients);
@@ -254,20 +336,46 @@ io.on('connection', function(socket) {
     });
   });
 
-  // When the user connects, send a join message to all other clients.
-  io.emit('user joined', {
+  socket.on('direct message', function(msg) {
+  	let target = msg.target;
+  	if (chat_clients[target] == null) {
+  		socket.emit('error', 'Direct message target is unavailable.');
+  		return;
+  	}
+
+  	socket.emit('direct message', {
+  		authorId: client.authorId + "#OUTBOUND",
+  		author: 'You -> ' + chat_clients[target].author,
+  		text: msg.message,
+  		date: Date.now()
+  	});
+
+  	chat_clients_socket[target].forEach(sock => sock.emit('direct message', {
   		...client,
-    	date: Date.now(),
+  		text: msg.message,
+  		date: Date.now()
+  	}));
   });
+
+  // When the user connects, send a join message to all other clients.
+  if (chat_client_socket_index == 0) {
+	  io.emit('user joined', {
+	  		...client,
+	    	date: Date.now(),
+	  });
+	}
 
   // When the user disconnects, send a leave message to all other clients.
   socket.on('disconnect', function(reason) {
-  	io.emit('user left', {
-  		...client,
-    	date: Date.now(),
-  	});
-
-  	delete chat_clients[session.loginid];
+  	chat_clients_socket[session.loginid].splice(chat_client_socket_index, 1);
+  	if (chat_clients_socket[session.loginid].length == 0) {
+  		delete chat_clients_socket[session.loginid];
+  		delete chat_clients[session.loginid];
+	  	io.emit('user left', {
+	  		...client,
+	    	date: Date.now(),
+	  	});
+  	}
   });
 
 });
@@ -286,6 +394,30 @@ app.post('/api/register', function(req, res) {
 	});
 });
 
+app.post('/api/remote/lookup_calories', function(req, res) {
+	nutritionixFoodLookup(req.body, (error, data) => {
+		if (error) {
+			res.status(400);
+			res.error('Remote API failure.');
+			console.error(error);
+			return;
+		}
+
+		if (!data.foods) {
+			res.end(JSON.stringify({
+				success: false,
+				message: data.message
+			}));
+			return;
+		}
+
+		res.end(JSON.stringify({
+			success: true,
+			calories: data.foods[0].nf_calories,
+			food: data.foods[0].food_name
+		}));
+	});
+});
 
 app.post("/api/login", function(req, res) {
 	loginUser(req.body, function (error, data) {
@@ -360,7 +492,7 @@ app.post("/api/login", function(req, res) {
 })
 
 app.post('/api/calories', loginRequired, function(req, res) {
-	addProgress(req.body, function(error, data) {
+	addProgress(req.session.user.username, req.body, function(error, data) {
 		if (error) {
 			res.status(400);
 			res.send('ERROR. Query failed, check console for more info.');
@@ -368,7 +500,7 @@ app.post('/api/calories', loginRequired, function(req, res) {
 			return;
 		}
 
-		res.redirect('/');
+		res.redirect('/calories');
 	});
 });
 
@@ -390,7 +522,7 @@ app.get('/logout', function(req, res, next) {
 app.get('/admin', loginRequired, async (req, res) => {
     try {
       const client = await pool.connect();
-      const result = await client.query('SELECT * FROM users order by lastname', function(error, result){
+      const result = await client.query("SELECT * FROM users where username !='admin' order by lastname", function(error, result){
         const results = { 'results': (result) ? result.rows : null};
         res.render('pages/admin', results)
         client.release();
@@ -420,11 +552,11 @@ app.get('/edituser/:id', async (req, res) => {
 app.post('/edituser/:id', async (req, res) => {
     try {
       const client = await pool.connect();
-      await client.query('update users set username=$1, password=$2, firstname=$3, lastname=$4, email=$5, age=$6, weight=$7, height=$8, gender=$9, activity_level=$10, fit_goal=$11 where id=$12',
+      await client.query('update users set username=$1, password=$2, firstname=$3, lastname=$4, email=$5, age=$6, weight=$7, height=$8, gender=$9, activity_level=$10, fit_goal=$11, adminlevel=$12 where username=$13',
       [req.body.username, req.body.password, req.body.firstname, req.body.lastname, req.body.email,
-      req.body.age, req.body.weight, req.body.height, req.body.gender, req.body.activity_level, req.body.fit_goal, req.params.id]);
+      req.body.age, req.body.weight, req.body.height, req.body.gender, req.body.activity_level, req.body.fit_goal, req.body.admin_level, req.params.id]);
 
-      res.redirect('pages/admin');
+      res.redirect('/admin');
       client.release();
     }catch (err) {
       console.error(err);
@@ -440,7 +572,7 @@ app.get('/delete-user/:id', async (req, res) => {
         var count=result.rowCount;
 
         assert(count==0);
-        res.redirect('/admin')
+        res.redirect('pages/admin')
         client.release();
       });
 
@@ -455,7 +587,6 @@ app.get('/delete-user/:id', async (req, res) => {
 
 app.post('/api/addGoal', loginRequired, function(req,res){
 	try {
-
 		pool.query('INSERT INTO dailygoal(username, goalnum, goal) VALUES($1,$2,$3);',[req.body.username,req.body.goalcount1,req.body.goal],function(err){
 			if(err){
 				console.log(err);
@@ -496,9 +627,8 @@ app.post('/api/deleteGoal', loginRequired, function(req,res){
 app.get('/forum-home', loginRequired, async (req, res)=> {
     try {
       const client = await pool.connect();
-      await client.query('select * from topics left join users on topics.topic_by= users.username order by topic_id desc limit 5', function(error, result){
-        const results = { 'results': (result) ? result.rows : null};
-        res.render('pages/forum', results );
+      await client.query('select * from topics left join categories on topics.topic_cat=categories.cat_id order by topic_id desc limit 5', function(error, result){
+        res.render('pages/forum', {results: result.rows, user: req.session.user.username });
         client.release();
       });
 
@@ -515,7 +645,8 @@ app.get('/addTopic', loginRequired, function(req, res){
 app.post('/postTopic', loginRequired, async (req, res) => {
     try {
       const client = await pool.connect();
-      await client.query("insert into topics(topic_subject, topic_by, topic_content) values($1, $2, $3)",[req.body.topic, req.session.user.username, req.body.content]);
+      await client.query("insert into topics(topic_subject, topic_by, topic_content, topic_cat) values($1, $2, $3, $4)",[req.body.topic, req.session.user.username, req.body.content, req.body.category]);
+      console.log(req.body.content);
       res.redirect('/forum-home');
       client.release();
     } catch (err) {
@@ -551,9 +682,64 @@ app.post('/postReply/:id', async(req, res) =>{
     console.error(err);
     res.send(err);
   }
+});
+
+
+app.post('/forum-search', async(req, res) => {
+  try{
+    const client=await pool.connect();
+
+    await client.query("select * from topics full join categories on topics.topic_cat=categories.cat_id where topics.topic_content like $1 OR topics.topic_subject like $1 OR categories.cat_name like $1 OR categories.cat_search like $1",['%'+req.body.search+'%'],function(error, result){
+      res.render('pages/forum-search', {results:result});
+    });
+  }  catch (err){
+      console.error(err);
+      res.send(err);
+    }
+});
+
+app.get('/editProfile/:id',loginRequired, async (req, res) => {
+    try {
+      const client = await pool.connect();
+      await client.query("select * from users where username=$1",[req.params.id], function(error, result){
+        console.log(result.rows[0]);
+        res.render('pages/editProfile', {user: result.rows[0]});
+        client.release();
+      });
+    }catch (err) {
+      console.error(err);
+      res.send("Error " + err);
+    }
 
 });
 
+app.post('/editProfile/:id', async (req, res) => {
+   try {
+     const client = await pool.connect();
+     await client.query('update users set username=$1, password=$2, firstname=$3, lastname=$4, email=$5, age=$6, weight=$7, height=$8, gender=$9, activity_level=$10, fit_goal=$11 where username=$12',
+     [req.body.username, req.body.password, req.body.firstname, req.body.lastname, req.body.email,
+     req.body.age, req.body.weight, req.body.height, req.body.gender, req.body.activity_level, req.body.fit_goal, req.params.id]);
+
+     res.redirect('/');
+     client.release();
+   }catch (err) {
+     console.error(err);
+     res.send("Error " + err);
+   }
+});
+
+app.post('/addPoints', async(req, res) => {
+  try{
+    const client=await pool.connect();
+    await client.query("update users set score=(select score from users where username=$1)+$2 where username=$3", [req.session.user.username, req.body.score, req.session.user.username]);
+    res.redirect('/workouts');
+    client.release();
+  }catch (err){
+    console.error(err);
+    res.send(err);
+  }
+
+});
 
 function getFriendRequest(data, callback){
 
@@ -621,16 +807,18 @@ function getFriendList(data, callback){
 
 app.post('/change-picture', (req, res) => {
 
+	console.log(req.file);
+
 	upload(req, res, (err) => {
 		if (err) {
 			console.log(err);
 			res.render('pages/index.ejs', { session: req.session });
 		}
 		else {
-			if (req.file == undefined) {
-				res.redirect('pages/profile', {
-					msg: 'Error: No File Selected!'
-				});
+			if (req.file == undefined || req.file == null) {
+				res.render('pages/profile', {
+					session:req.session,
+					msge: 'Error! Please select a photo' })
 			}
 			else {
 
@@ -643,7 +831,7 @@ app.post('/change-picture', (req, res) => {
 				req.session.user.userImage = req.session.user.username + req.file.originalname;
 				res.render('pages/profile', {
 					session:req.session,
-					msg: 'Photo uploaded succesfully!' })
+					msgs: 'Photo uploaded succesfully!' })
 			};
 		}
 	});
@@ -1013,3 +1201,26 @@ app.post('/searchuser', loginRequired, async (req, res)=> {
       res.send("Error " + err);
     }
 });
+
+// Remote API: Nutritionix
+
+// Looks up the calories and other data for food.
+function nutritionixFoodLookup(food, callback) {
+	request({
+		url: 'https://trackapi.nutritionix.com/v2/natural/nutrients',
+		method: 'POST',
+		body: {
+			query: food.query,
+			timezone: "US/Eastern"
+		},
+		json: true,
+		headers: {
+			'x-app-id': NUTRITIONIX_DEV_KEY,
+			'x-app-key': NUTRITIONIX_API_KEY
+		}
+	}, (err, res, data) => {
+		if (err) return callback(err);
+
+		callback(null, data);
+	})
+}

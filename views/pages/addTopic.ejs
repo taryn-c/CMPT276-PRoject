@@ -5,22 +5,36 @@
     <title>Add Topic</title>
     <% include ../partials/head.ejs %>
   </head>
-  <body>
+  <body id="page-top">
   <% include ../partials/navuser.ejs %>
-  <br>
+
   <h4 style="text-align:center; margin-top:1%">Create New Discussion</h4>
   <div class="container topic-form" style="margin-top:5%; margin-bottom:5%; width:70%">
     <form method="post" action="/postTopic">
       <div class="form-group">
+        <label for="category">Category</label>
+        <select class="selectpicker show-tick" name="category">
+          <option value=10>Body Building</option>
+          <option value=11>Losing Fat</option>
+          <option value=12>Gaining Weight</option>
+          <option value=13>Injuries</option>
+          <option value=14>Sports</option>
+          <option value=15>Nutrition</option>
+          <option value=16>Supplements</option>
+          <option value=17>Motivation</option>
+          <option value=18>Miscellaneous</option>
+        </select>
+      </div>
+      <div class="form-group">
         <label for="topic">Title</label>
-        <input id="topic" name="topic" type="text" class="form-control" placeholder="Topic">
+        <input id="topic" name="topic" type="text" class="form-control" placeholder="Topic" required>
       </div>
       <div class="form-group">
         <label for="content">Content</label>
-        <textarea style="width: 100%; height: 150px;" id="content" name="content"  class="form-control" placeholder=""></textarea>
+        <textarea style="width: 100%; height: 150px;" id="content" name="content"  class="form-control" placeholder="" required></textarea>
       </div>
       <div class="form-group">
-        <button type="submit" class="btn btn-info">Create</button>
+        <button type="submit" class="btn btn-info btn-dark">Create</button>
       </div>
 
     </form>
