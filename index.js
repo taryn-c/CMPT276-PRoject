@@ -217,14 +217,12 @@ app.get('/', loginRequired, async(req, res) => {
 			if (err){
 				return console.log(err);
 			}
-			console.log(dailygoal.rows);
 	  req.session.user.goals = dailygoal.rows;
 	  client.query("select goalcount from users where username=$1", [req.session.user.username], function(err, goalcount){
 		if (err){
 			return console.log(err);
 		}
 	req.session.user.goalcount = goalcount.rows;
-	console.log(req.session.user.goalcount);
       res.render('pages/index', {results:result, session:req.session});
 	  client.release();
 		});
@@ -563,8 +561,6 @@ app.get('/delete-user/:id', async (req, res) => {
 
 app.post('/api/addGoal', loginRequired, function(req,res){
 	try {
-		console.log(req.body.goalcount1);
-
 		pool.query('INSERT INTO dailygoal(username, goalnum, goal) VALUES($1,$2,$3);',[req.body.username,req.body.goalcount1,req.body.goal],function(err){
 			if(err){
 				console.log(err);
