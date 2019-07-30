@@ -11,7 +11,7 @@
 <main>
   <% include ../partials/navuser.ejs %>
   <% if (session.login) { %>
-    <p id = "count" style="display: none"><%= session.user.goalcount %></p>
+    <p id = "count"><%= session.user.goalcount[0].goalcount %></p>
   <div class="row">
     <div class="col-lg-8"align="left">
 
