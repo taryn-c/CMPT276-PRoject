@@ -21,6 +21,20 @@ const ADMIN_LEVEL_NOT_ADMIN = 0;
 const ADMIN_LEVEL_REGULAR_ADMIN = 1;
 const ADMIN_LEVEL_SUPER_ADMIN = 2;
 
+var curday = function(sp){
+	today = new Date();
+	today.setHours(today.getHours() - 8);
+	var dd = today.getDate();
+	var mm = today.getMonth()+1; //As January is 0.
+	var yyyy = today.getFullYear();
+	
+	if(dd<10) dd='0'+dd;
+	if(mm<10) mm='0'+mm;
+	return (yyyy + sp + mm + sp + dd);
+	};
+
+console.log(curday("-"));
+
 //Connect to Postgres database
 
  var pool = new Pool({
@@ -222,13 +236,25 @@ app.get('/', loginRequired, async(req, res) => {
 		if (err){
 			return console.log(err);
 		}
-	req.session.user.goalcount = goalcount.rows;
-      res.render('pages/index', {results:result, session:req.session});
+		req.session.user.goalcount = goalcount.rows;
+		client.query("select SUM(cal_cons - cal_burn) as netCal from user_progress where uid=$1 and on_date =$2", [req.session.user.username, curday("-")], function(err, netcal){
+		if (err){
+			return console.log(err);
+		}
+		if (netcal.rows == null)
+		{
+			netcall.rows = 0;
+		}
+		console.log(netcal.rows);
+
+      res.render('pages/index', {results:result, session:req.session, netcal:netcal.rows});
 	  client.release();
 		});
 	});
 
 	});
+});
+
 
   }catch (err) {
     console.error(err);
