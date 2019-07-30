@@ -17,8 +17,7 @@
 .reply{
   background-color: azure;
   border-bottom:1px solid black;
-
-  color:white;
+  color: black;
 }
 
 .replies{
@@ -31,7 +30,6 @@
 .form{
   width: 50%;
   height: 120px;
-  color:white;
 }
 
 h3 {

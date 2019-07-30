@@ -646,7 +646,6 @@ app.post('/postTopic', loginRequired, async (req, res) => {
     try {
       const client = await pool.connect();
       await client.query("insert into topics(topic_subject, topic_by, topic_content, topic_cat) values($1, $2, $3, $4)",[req.body.topic, req.session.user.username, req.body.content, req.body.category]);
-      console.log(req.body.content);
       res.redirect('/forum-home');
       client.release();
     } catch (err) {
@@ -673,7 +672,8 @@ app.get('/topic/:id', loginRequired, async (req, res) => {
 app.post('/postReply/:id', async(req, res) =>{
   try {
     const client=await pool.connect();
-    await client.query('insert into replies(reply_topic, reply_by) select topic_id, topic_by from topics order by topic_id desc limit 1');
+    console.log(req.params.id);
+    await client.query('insert into replies(reply_topic, reply_by) values($1, $2)',[req.params.id, req.session.user.username] );
     await client.query('update replies set reply_content=$1 where reply_id IN (SELECT max(reply_id) FROM replies)',[req.body.reply]);
     res.redirect('/topic/'+req.params.id);
     client.release();
