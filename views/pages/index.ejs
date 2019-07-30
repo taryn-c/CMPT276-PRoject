@@ -11,7 +11,7 @@
 <main>
   <% include ../partials/navuser.ejs %>
   <% if (session.login) { %>
-    <p id = "count" style="display: none"><%= session.user.goalcount %></p>
+    <p id = "count"><%= session.user.goalcount[0].goalcount %></p>
   <div class="row">
     <div class="col-lg-8"align="left">
 
@@ -165,10 +165,10 @@
 
     </script>
 
-
-    <div id="cal">
-      <h5>Calories per day to sustain your goal: <%= session.user.calorie %></h5>
-
+    <div class="row">
+      <div id="cal" class="col-lg-12">
+        <h5>Calories per day to sustain your goal: <%= session.user.calorie %></h5>
+      </div>
     </div>
     <% } else { %>
 

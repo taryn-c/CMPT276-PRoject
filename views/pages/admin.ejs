@@ -7,8 +7,7 @@
 
 <body>
   <% include ../partials/navadmin.ejs %>
-  <button class="btn btn-primary pull-right" onclick='window.location.href="/logout"'>
-   Logout</button>
+
   <br>
   <div class="container">
 
@@ -33,7 +32,7 @@
             <p><strong>Weight: </strong><%=r.weight%></p>
             <p><strong>Height: </strong><%=r.height%></p>
             <p><strong>Email: </strong><%=r.email%></p>
-            <p><strong>Birth Date </strong><%=r.birthday%></p>
+            <p><strong>Birth Date </strong><%=r.age%></p>
             <hr>
             <button class="btn btn-dark" onclick='window.location.href="/edituser/<%=r.username%>"'>Edit</button>
             <button class="btn btn-danger" id="delete" onclick='window.location.href="/delete-user/<%=r.username%>"';>Delete</button>

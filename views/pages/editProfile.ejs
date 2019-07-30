@@ -7,13 +7,13 @@
 </head>
 
 <body>
-  <% include ../partials/navadmin.ejs %>
+  <% include ../partials/navuser.ejs %>
   <% include ../partials/styles/forms.ejs %>
 
   <br>
   <div class="signup-form">
-  <h3 style="margin-left:60px;">Edit <%=user.firstname%>'s Details</h3>
-    <form style="margin-left:60px;" action="/editUser/<%=user.username%>" method="post">
+  <h3 style="margin-left:60px;">Edit Your Details</h3>
+    <form style="margin-left:60px;" action="/editProfile/<%=user.username%>" method="post">
       <div class="row form-group">
         <div class="col-md-6">
           <input type="text" class="form-control" name="username" value="<%=user.username%>" required>
@@ -46,8 +46,8 @@
         <input type="number" class="form-control" name="height" value="<%=user.height%>" step="0.01" required>
         </div>
       </div>
-      <div class ="row form-group">
       <% if(user.gender=='male'){%>
+      <div class ="row form-group">
         <div class="col-md-3">
         <p>Gender:</p>
           <select name = "gender" value="<%=user.gender%>">
@@ -57,7 +57,7 @@
         </div>
         <%}
         else {%>
-
+          <div class ="row form-group">
             <div class="col-md-3">
             <p>Gender:</p>
               <select name = "gender" value="<%=user.gender%>">
@@ -187,31 +187,13 @@
             </div>
           <%}%>
 
-        <% if(user.adminlevel==0) {%>
-          <div class="form group">
-            <label for="admin_level"> Admin Level </label> <br>
-            <select id="admin_level" name="admin_level" value="<%=user.adminlevel%>">
-              <option value="0">Regular User</option>
-              <option value="1">Admin</option>
-            </select><br>
-          </div>
-          <%}
-          else { %>
-            <div class="form group">
-              <label for="admin_level"> Admin Level </label> <br>
-              <select id="admin_level" name="admin_level" value="<%=user.adminlevel%>">
-                <option value="1">Admin</option>
-                <option value="0">Regular User</option>
-              </select><br>
-            </div>
-          <%}%>
-        </div>
-    <br>
-    <div style="text-align:center"class="form-group">
-        <button type="submit" class="btn btn-success btn-large">Submit</button>
+      </div>
     </div>
-  </div>
+      <div style="text-align:center"class="form-group">
+          <button type="submit" class="btn btn-success btn-large">Submit</button>
+      </div>
 
-  </form>
+    </form>
+  </div>
 </body>
 </html>

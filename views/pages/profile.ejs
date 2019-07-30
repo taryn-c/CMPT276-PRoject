@@ -67,15 +67,20 @@
             background-color: red;
         }
     </style>
+
         <section id="portfolio" class="bg-light">
+          <div class="text-left" style="margin-left:30px;">
+            <button class="btn btn-dark" onclick='window.location.href="/editProfile/<%=session.user.username%>"'>Edit Account Details</button>
+          </div>
                 <div class="container">
                     <div class="row">
                         <div class="col-lg-12 text-center" style="height: 200px;">
                             <h2 class="text-uppercase section-heading">Profile</h2>
                             <h3 class="section-subheading text-muted" style="height: 200px;"><br>Welcome to your profile, <%= session.user.fname %> <span style="color: blue">(@<%= session.user.username %>).<br> <br> Feel free to upload a new profile picture, check your friend requests (below), or search for users (above)<br><br></h3>
                         </div>
+
                         <div class="col">
-                            
+
                             <div style="margin-left: 40%">
                                 <img class="profilestyle" src="/upload/<%= session.user.userImage %>" alt="<%= session.user.userImage %>">
                                 <form action="/change-picture" enctype="multipart/form-data" method="post" style="margin-top: 10px">
@@ -121,7 +126,7 @@
                                   </div>
                                   </form>
                                   </div>
-                              
+
                             <% } } %>
                         </div>
                         <div class="col-lg-12 text-center" style="height: 100px;padding: 15px 15px;">
@@ -131,9 +136,9 @@
                             <% for(var i = 0; i < session.user.friendsList.length; i++) { %>
                                 <div class="usercard col-lg-3">
                                 <p class="usercard-username">username: @<%= session.user.friendsList[i].f1 %></p>
-                                  
+
                                 </div>
-                              
+
                             <% } } %>
                         </div>
                     </div>
