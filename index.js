@@ -587,6 +587,14 @@ app.get('/delete-user/:id', async (req, res) => {
 
 app.post('/api/addGoal', loginRequired, function(req,res){
 	try {
+		console.log(req.body.goalcount1);
+		console.log(typeof(req.body.goalcount1));
+
+		if(typeof(req.body.goalcount1) == 'object')
+		{
+			req.body.goalcount1 = req.body.goalcount1[req.body.goalcount1.length - 1];
+			console.log(req.body.goalcount1);
+		}
 		pool.query('INSERT INTO dailygoal(username, goalnum, goal) VALUES($1,$2,$3);',[req.body.username,req.body.goalcount1,req.body.goal],function(err){
 			if(err){
 				console.log(err);
