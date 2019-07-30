@@ -522,7 +522,7 @@ app.get('/logout', function(req, res, next) {
 app.get('/admin', loginRequired, async (req, res) => {
     try {
       const client = await pool.connect();
-      const result = await client.query('SELECT * FROM users order by lastname', function(error, result){
+      const result = await client.query("SELECT * FROM users where username !='admin' order by lastname", function(error, result){
         const results = { 'results': (result) ? result.rows : null};
         res.render('pages/admin', results)
         client.release();
@@ -552,11 +552,11 @@ app.get('/edituser/:id', async (req, res) => {
 app.post('/edituser/:id', async (req, res) => {
     try {
       const client = await pool.connect();
-      await client.query('update users set username=$1, password=$2, firstname=$3, lastname=$4, email=$5, age=$6, weight=$7, height=$8, gender=$9, activity_level=$10, fit_goal=$11 where id=$12',
+      await client.query('update users set username=$1, password=$2, firstname=$3, lastname=$4, email=$5, age=$6, weight=$7, height=$8, gender=$9, activity_level=$10, fit_goal=$11, adminlevel=$12 where username=$13',
       [req.body.username, req.body.password, req.body.firstname, req.body.lastname, req.body.email,
-      req.body.age, req.body.weight, req.body.height, req.body.gender, req.body.activity_level, req.body.fit_goal, req.params.id]);
+      req.body.age, req.body.weight, req.body.height, req.body.gender, req.body.activity_level, req.body.fit_goal, req.body.admin_level, req.params.id]);
 
-      res.redirect('pages/admin');
+      res.redirect('/admin');
       client.release();
     }catch (err) {
       console.error(err);
@@ -572,7 +572,7 @@ app.get('/delete-user/:id', async (req, res) => {
         var count=result.rowCount;
 
         assert(count==0);
-        res.redirect('/admin')
+        res.redirect('pages/admin')
         client.release();
       });
 
@@ -682,8 +682,8 @@ app.post('/postReply/:id', async(req, res) =>{
     console.error(err);
     res.send(err);
   }
-
 });
+
 
 app.post('/forum-search', async(req, res) => {
   try{
@@ -696,6 +696,36 @@ app.post('/forum-search', async(req, res) => {
       console.error(err);
       res.send(err);
     }
+});
+
+app.get('/editProfile/:id',loginRequired, async (req, res) => {
+    try {
+      const client = await pool.connect();
+      await client.query("select * from users where username=$1",[req.params.id], function(error, result){
+        console.log(result.rows[0]);
+        res.render('pages/editProfile', {user: result.rows[0]});
+        client.release();
+      });
+    }catch (err) {
+      console.error(err);
+      res.send("Error " + err);
+    }
+
+});
+
+app.post('/editProfile/:id', async (req, res) => {
+   try {
+     const client = await pool.connect();
+     await client.query('update users set username=$1, password=$2, firstname=$3, lastname=$4, email=$5, age=$6, weight=$7, height=$8, gender=$9, activity_level=$10, fit_goal=$11 where username=$12',
+     [req.body.username, req.body.password, req.body.firstname, req.body.lastname, req.body.email,
+     req.body.age, req.body.weight, req.body.height, req.body.gender, req.body.activity_level, req.body.fit_goal, req.params.id]);
+
+     res.redirect('/');
+     client.release();
+   }catch (err) {
+     console.error(err);
+     res.send("Error " + err);
+   }
 });
 
 app.post('/addPoints', async(req, res) => {
