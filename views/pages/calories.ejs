@@ -8,7 +8,7 @@
 
   <body id="page-top">
   <% include ../partials/navuser.ejs %>
-  
+
       <section id="portfolio" class="bg-light">
           <div class="container">
               <div class="row">
@@ -19,11 +19,11 @@
               </div>
               <div class="row">
                   <div class="col align-self-center">
-                      <form action="/api/calories" method="POST">
+                      <form id="newActivity" action="/api/calories" method="POST">
                           <div class="form-group"><input type="number" class="form-control" name="caloriesConsumed"placeholder="Calories-consumed (just for record)" step="1" required min="0" /></div>
                           Not sure how many calories you consumed?
                           <a target="_blank" class="portfolio-link" data-toggle="modal" href="/calories/lookup">Look it up here.</a><br><br>
-                          <div class="form-group"><select class="form-control" select name="activityMET"><optgroup label="This is a group">
+                          <div class="form-group"><select class="form-control" select name="activityMET"><optgroup label="Physical Activites">
                             <p>Physical Activity:</p>
                                 <option value=8.5>bicycling, mountain, general</option>
                                 <option value=3.5>bicycling, leisure, 5.5 mph</option>
@@ -76,7 +76,7 @@
                   </div>
               </div>
               <div class="row">
-                  <p id="calBurned"></p>
+                  <h6 id="calBurned"></h6>
               </div>
           </div>
       </section>
@@ -149,11 +149,11 @@
               <button type="submit" class="btn btn-primary">Add to record</button>
               </div>
           </form>
-<<<<<<< HEAD
+
       </div>
       -->
       <script>
-	  
+
         var activityform = document.getElementById("newActivity");
         console.log(activityform);
         activityform.addEventListener("input", function () {
@@ -164,7 +164,7 @@
             console.log(burned);
             document.getElementById("calBurned").innerHTML = "From the latest entry, you have burned " + burned + " calories.";
         });
-		
+
         $(document).ready(() => {
           $("#search-form").on('submit', (event) => {
             event.preventDefault();
@@ -186,7 +186,7 @@
             });
           })
         })
-        
+
     </script>
   </body>
 </html>
