@@ -21,6 +21,20 @@ const ADMIN_LEVEL_NOT_ADMIN = 0;
 const ADMIN_LEVEL_REGULAR_ADMIN = 1;
 const ADMIN_LEVEL_SUPER_ADMIN = 2;
 
+var curday = function(sp){
+	today = new Date();
+	today.setHours(today.getHours() - 8);
+	var dd = today.getDate();
+	var mm = today.getMonth()+1; //As January is 0.
+	var yyyy = today.getFullYear();
+
+	if(dd<10) dd='0'+dd;
+	if(mm<10) mm='0'+mm;
+	return (yyyy + sp + mm + sp + dd);
+	};
+
+console.log(curday("-"));
+
 //Connect to Postgres database
 
  var pool = new Pool({
@@ -79,13 +93,13 @@ function createUser(data, callback) {
 	if (data.fit_goal == null) return callback('createUser missing fit_goal in 2nd argument');
 
 	if(data.gender == 'male'){
-		var calorie = (10.0 * (2.220 * data.weight) + (6.25 * data.height) - (5*data.age) + 5)
+		var calorie = (4.536 * data.weight) + (6.25* data.height) - (5 * data.age) + 5;
 		calorie = (calorie*data.activity_level)
 		calorie = calorie + data.fit_goal;
 		var userImage = 'default_m.png';
 		}
 	else if (data.gender == 'female'){
-		var calorie = (10* (2.220 * data.weight) + (6.25 * data.height) - (5*data.age) - 161)
+		var calorie = (4.536 * data.weight) + (6.25* data.height) - (5 * data.age) - 161;
 		calorie = (calorie*data.activity_level)
 		calorie = calorie + data.fit_goal;
 		var userImage = 'default_f.png';
@@ -218,10 +232,29 @@ app.get('/', loginRequired, async(req, res) => {
 				return console.log(err);
 			}
 	  req.session.user.goals = dailygoal.rows;
-      res.render('pages/index', {results:result, session:req.session});
+	  client.query("select goalcount from users where username=$1", [req.session.user.username], function(err, goalcount){
+		if (err){
+			return console.log(err);
+		}
+		req.session.user.goalcount = goalcount.rows;
+		client.query("select SUM(cal_cons - cal_burn) as netCal from user_progress where uid=$1 and on_date =$2", [req.session.user.username, curday("-")], function(err, netcal){
+		if (err){
+			return console.log(err);
+		}
+		if (netcal.rows == null)
+		{
+			netcall.rows = 0;
+		}
+		console.log(netcal.rows);
+
+      res.render('pages/index', {results:result, session:req.session, netcal:netcal.rows});
 	  client.release();
 		});
 	});
+
+	});
+});
+
 
   }catch (err) {
     console.error(err);
@@ -467,7 +500,7 @@ app.post('/api/calories', loginRequired, function(req, res) {
 			return;
 		}
 
-		//res.redirect('/calories');
+		res.redirect('/calories');
 	});
 });
 
@@ -489,7 +522,7 @@ app.get('/logout', function(req, res, next) {
 app.get('/admin', loginRequired, async (req, res) => {
     try {
       const client = await pool.connect();
-      const result = await client.query('SELECT * FROM users order by lastname', function(error, result){
+      const result = await client.query("SELECT * FROM users where username !='admin' order by lastname", function(error, result){
         const results = { 'results': (result) ? result.rows : null};
         res.render('pages/admin', results)
         client.release();
@@ -519,11 +552,11 @@ app.get('/edituser/:id', async (req, res) => {
 app.post('/edituser/:id', async (req, res) => {
     try {
       const client = await pool.connect();
-      await client.query('update users set username=$1, password=$2, firstname=$3, lastname=$4, email=$5, age=$6, weight=$7, height=$8, gender=$9, activity_level=$10, fit_goal=$11 where id=$12',
+      await client.query('update users set username=$1, password=$2, firstname=$3, lastname=$4, email=$5, age=$6, weight=$7, height=$8, gender=$9, activity_level=$10, fit_goal=$11, adminlevel=$12 where username=$13',
       [req.body.username, req.body.password, req.body.firstname, req.body.lastname, req.body.email,
-      req.body.age, req.body.weight, req.body.height, req.body.gender, req.body.activity_level, req.body.fit_goal, req.params.id]);
+      req.body.age, req.body.weight, req.body.height, req.body.gender, req.body.activity_level, req.body.fit_goal, req.body.admin_level, req.params.id]);
 
-      res.redirect('pages/admin');
+      res.redirect('/admin');
       client.release();
     }catch (err) {
       console.error(err);
@@ -539,7 +572,7 @@ app.get('/delete-user/:id', async (req, res) => {
         var count=result.rowCount;
 
         assert(count==0);
-        res.redirect('/admin')
+        res.redirect('pages/admin')
         client.release();
       });
 
@@ -554,8 +587,15 @@ app.get('/delete-user/:id', async (req, res) => {
 
 app.post('/api/addGoal', loginRequired, function(req,res){
 	try {
+		console.log(req.body.goalcount1);
+		console.log(typeof(req.body.goalcount1));
 
-		pool.query('INSERT INTO dailygoal(username, goalnum, goal) VALUES($1,$2,$3);',[req.session.user.username,req.body.goalcount1,req.body.goal],function(err){
+		if(typeof(req.body.goalcount1) == 'object')
+		{
+			req.body.goalcount1 = req.body.goalcount1[req.body.goalcount1.length - 1];
+			console.log(req.body.goalcount1);
+		}
+		pool.query('INSERT INTO dailygoal(username, goalnum, goal) VALUES($1,$2,$3);',[req.body.username,req.body.goalcount1,req.body.goal],function(err){
 			if(err){
 				console.log(err);
 			}
@@ -578,7 +618,7 @@ app.post('/api/deleteGoal', loginRequired, function(req,res){
 
 	try {
 
-			pool.query('DELETE FROM dailygoal WHERE (username = $1 AND goalnum = $2);',[req.session.user.username,req.body.goalcount],function(err){
+			pool.query('DELETE FROM dailygoal WHERE (username = $1 AND goalnum = $2);',[req.body.username,req.body.goalcount],function(err){
 				if(err){
 					console.log(err);
 				}
@@ -614,7 +654,6 @@ app.post('/postTopic', loginRequired, async (req, res) => {
     try {
       const client = await pool.connect();
       await client.query("insert into topics(topic_subject, topic_by, topic_content, topic_cat) values($1, $2, $3, $4)",[req.body.topic, req.session.user.username, req.body.content, req.body.category]);
-      console.log(req.body.content);
       res.redirect('/forum-home');
       client.release();
     } catch (err) {
@@ -641,7 +680,8 @@ app.get('/topic/:id', loginRequired, async (req, res) => {
 app.post('/postReply/:id', async(req, res) =>{
   try {
     const client=await pool.connect();
-    await client.query('insert into replies(reply_topic, reply_by) select topic_id, topic_by from topics order by topic_id desc limit 1');
+    console.log(req.params.id);
+    await client.query('insert into replies(reply_topic, reply_by) values($1, $2)',[req.params.id, req.session.user.username] );
     await client.query('update replies set reply_content=$1 where reply_id IN (SELECT max(reply_id) FROM replies)',[req.body.reply]);
     res.redirect('/topic/'+req.params.id);
     client.release();
@@ -650,8 +690,8 @@ app.post('/postReply/:id', async(req, res) =>{
     console.error(err);
     res.send(err);
   }
-
 });
+
 
 app.post('/forum-search', async(req, res) => {
   try{
@@ -664,6 +704,36 @@ app.post('/forum-search', async(req, res) => {
       console.error(err);
       res.send(err);
     }
+});
+
+app.get('/editProfile/:id',loginRequired, async (req, res) => {
+    try {
+      const client = await pool.connect();
+      await client.query("select * from users where username=$1",[req.params.id], function(error, result){
+        console.log(result.rows[0]);
+        res.render('pages/editProfile', {user: result.rows[0]});
+        client.release();
+      });
+    }catch (err) {
+      console.error(err);
+      res.send("Error " + err);
+    }
+
+});
+
+app.post('/editProfile/:id', async (req, res) => {
+   try {
+     const client = await pool.connect();
+     await client.query('update users set username=$1, password=$2, firstname=$3, lastname=$4, email=$5, age=$6, weight=$7, height=$8, gender=$9, activity_level=$10, fit_goal=$11 where username=$12',
+     [req.body.username, req.body.password, req.body.firstname, req.body.lastname, req.body.email,
+     req.body.age, req.body.weight, req.body.height, req.body.gender, req.body.activity_level, req.body.fit_goal, req.params.id]);
+
+     res.redirect('/');
+     client.release();
+   }catch (err) {
+     console.error(err);
+     res.send("Error " + err);
+   }
 });
 
 app.post('/addPoints', async(req, res) => {
