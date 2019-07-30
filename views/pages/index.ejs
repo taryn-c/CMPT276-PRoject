@@ -58,7 +58,7 @@
   </div>
 </div>
     <script>
-  
+
       // Create a "close" button and append it to each list item
     var myNodelist = document.getElementsByTagName("LI");
     var i;
@@ -168,16 +168,15 @@
     </script>
 
 
-    <div id="cal">
-      <h5>Calories per day to sustain your goal: <%= session.user.calorie %></h5>
-      <h5>Net calories today: <%= netcal[0].netcal %></h5>
-    </div>
 
-    <div class="container">
+    <div class="container" style="margin-bottom:50px">
       <h2>Animated Calorie Progress Bar</h2>
-      <p>Your calorie goal for the day:</p> 
-      <div class="progress">
-        <div class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="<%=netcal[0].netcal %>" aria-valuemin="0" aria-valuemax="<%=session.user.calorie%>" style="width:40%">
+
+        <h6>Calories per day to sustain your goal: <%= session.user.calorie %></h6>
+        <h6>Net calories today: <%= netcal[0].netcal %></h6>
+
+      <div class="progress" style="height: 30px;">
+        <div class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="<%=netcal[0].netcal %>" aria-valuemin="0" aria-valuemax="<%=session.user.calorie%>" style="width:<%= Math.floor((100 * netcal[0].netcal/session.user.calorie))%>%; color: black;">
           <%= Math.floor((100 * netcal[0].netcal/session.user.calorie))%>%
         </div>
       </div>
