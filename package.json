@@ -24,7 +24,7 @@
     "multer": "^1.4.1",
     "pg": "^7.11.0",
     "request": "^2.88.0",
-    "socket.io": "^2.2.0"
+    "socket.io": "^2.5.0"
   },
   "devDependencies": {
     "tape": "^4.7.0"
